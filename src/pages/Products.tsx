@@ -1,11 +1,10 @@
 import { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useProducts, useCategories } from '@/hooks/useProducts';
+import { AddToCartButton } from '@/components/cart/AddToCartButton';
 import { 
-  PlusCircle, 
   Search, 
   Package, 
   Loader2,
@@ -17,7 +16,8 @@ import {
   Star,
   BadgeCheck,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  ShoppingCart
 } from 'lucide-react';
 
 const categoryIcons: Record<string, React.ElementType> = {
@@ -244,11 +244,18 @@ export default function Products() {
                                   </div>
                                 </div>
                               </div>
-                              <div className="text-right">
-                                <p className="font-semibold text-lg">Rs. {listing.price.toLocaleString()}</p>
-                                <p className={`text-xs ${listing.stock > 10 ? 'text-success' : listing.stock > 0 ? 'text-warning' : 'text-destructive'}`}>
-                                  {listing.stock > 0 ? `${listing.stock} in stock` : 'Out of stock'}
-                                </p>
+                              <div className="flex items-center gap-3">
+                                <div className="text-right">
+                                  <p className="font-semibold text-lg">Rs. {listing.price.toLocaleString()}</p>
+                                  <p className={`text-xs ${listing.stock > 10 ? 'text-success' : listing.stock > 0 ? 'text-warning' : 'text-destructive'}`}>
+                                    {listing.stock > 0 ? `${listing.stock} in stock` : 'Out of stock'}
+                                  </p>
+                                </div>
+                                <AddToCartButton 
+                                  listingId={listing.id} 
+                                  stock={listing.stock}
+                                  variant="icon"
+                                />
                               </div>
                             </div>
                           ))}

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import { Cpu, Menu, X, Package } from 'lucide-react';
 import { useState } from 'react';
+import { CartSheet } from '@/components/cart/CartSheet';
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -27,15 +27,19 @@ export function Navbar() {
               <Package className="h-4 w-4" />
               Products
             </Link>
+            <CartSheet />
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2 text-muted-foreground hover:text-foreground"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
+          {/* Mobile: Cart + Menu */}
+          <div className="md:hidden flex items-center gap-2">
+            <CartSheet />
+            <button
+              className="p-2 text-muted-foreground hover:text-foreground"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Menu */}
