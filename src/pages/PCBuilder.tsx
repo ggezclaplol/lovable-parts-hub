@@ -25,6 +25,8 @@ import {
   Check,
   ChevronRight,
   ChevronLeft,
+  ChevronDown,
+  ChevronUp,
   AlertTriangle,
   XCircle,
   ShoppingCart,
@@ -33,6 +35,7 @@ import {
   BadgeCheck,
   Package,
   RotateCcw,
+  Store,
 } from 'lucide-react';
 
 const iconMap: Record<string, React.ElementType> = {
@@ -53,6 +56,7 @@ export default function PCBuilder() {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [build, setBuild] = useState<BuildState>({});
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [expandedProduct, setExpandedProduct] = useState<string | null>(null);
 
   const currentStep = BUILD_STEPS[currentStepIndex];
 
@@ -79,6 +83,8 @@ export default function PCBuilder() {
       ...prev,
       [currentStep.id]: { product, listingId, price }
     }));
+
+    setExpandedProduct(null);
 
     // Auto-advance to next step
     if (currentStepIndex < BUILD_STEPS.length - 1) {
@@ -356,43 +362,129 @@ export default function PCBuilder() {
                   </div>
 
                   {/* Price & Seller */}
-                  <div className="flex items-center justify-between mt-4 pt-3 border-t border-border">
-                    <div>
-                      <p className="text-lg font-bold text-primary">
-                        Rs. {bestListing.price.toLocaleString()}
-                      </p>
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <span>{bestListing.seller.name}</span>
-                        {bestListing.seller.verified && (
-                          <BadgeCheck className="h-3 w-3 text-primary" />
+                  <div className="mt-4 pt-3 border-t border-border">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-lg font-bold text-primary">
+                          Rs. {bestListing.price.toLocaleString()}
+                        </p>
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <span>{bestListing.seller.name}</span>
+                          {bestListing.seller.verified && (
+                            <BadgeCheck className="h-3 w-3 text-primary" />
+                          )}
+                          <Star className="h-3 w-3 fill-warning text-warning ml-1" />
+                          <span>{bestListing.seller.rating.toFixed(1)}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {product.listings.length > 1 && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setExpandedProduct(expandedProduct === product.id ? null : product.id)}
+                          >
+                            <Store className="h-4 w-4 mr-1" />
+                            {product.listings.length}
+                            {expandedProduct === product.id ? (
+                              <ChevronUp className="h-4 w-4 ml-1" />
+                            ) : (
+                              <ChevronDown className="h-4 w-4 ml-1" />
+                            )}
+                          </Button>
                         )}
-                        <Star className="h-3 w-3 fill-warning text-warning ml-1" />
-                        <span>{bestListing.seller.rating.toFixed(1)}</span>
+                        <Button
+                          size="sm"
+                          variant={isSelected ? 'outline' : 'default'}
+                          disabled={!compatibility.compatible}
+                          onClick={() => handleSelectProduct(product, bestListing.id, bestListing.price)}
+                        >
+                          {isSelected ? (
+                            <>
+                              <Check className="h-4 w-4 mr-1" />
+                              Selected
+                            </>
+                          ) : (
+                            'Select'
+                          )}
+                        </Button>
                       </div>
                     </div>
-                    <Button
-                      size="sm"
-                      variant={isSelected ? 'outline' : 'default'}
-                      disabled={!compatibility.compatible}
-                      onClick={() => handleSelectProduct(product, bestListing.id, bestListing.price)}
-                    >
-                      {isSelected ? (
-                        <>
-                          <Check className="h-4 w-4 mr-1" />
-                          Selected
-                        </>
-                      ) : (
-                        'Select'
-                      )}
-                    </Button>
-                  </div>
 
-                  {/* Other sellers */}
-                  {product.listings.length > 1 && (
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Also available from {product.listings.length - 1} other seller{product.listings.length > 2 ? 's' : ''}
-                    </p>
-                  )}
+                    {/* Expanded Seller Listings */}
+                    {expandedProduct === product.id && product.listings.length > 1 && (
+                      <div className="mt-4 space-y-2 animate-fade-in">
+                        <p className="text-sm font-medium text-muted-foreground mb-2">
+                          Choose a seller:
+                        </p>
+                        {product.listings
+                          .sort((a, b) => a.price - b.price)
+                          .map((listing) => {
+                            const isListingSelected = build[currentStep.id]?.listingId === listing.id;
+                            return (
+                              <div
+                                key={listing.id}
+                                className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
+                                  isListingSelected
+                                    ? 'border-primary bg-primary/10'
+                                    : 'border-border bg-card/50 hover:border-primary/50'
+                                }`}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div>
+                                    <div className="flex items-center gap-2">
+                                      <span className="font-medium text-sm">{listing.seller.name}</span>
+                                      {listing.seller.verified && (
+                                        <BadgeCheck className="h-4 w-4 text-primary" />
+                                      )}
+                                    </div>
+                                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                      <Star className="h-3 w-3 fill-warning text-warning" />
+                                      <span>{listing.seller.rating.toFixed(1)}</span>
+                                      <span>•</span>
+                                      <span className="capitalize">{listing.condition}</span>
+                                      {listing.shipping_cost > 0 ? (
+                                        <>
+                                          <span>•</span>
+                                          <span>+Rs. {listing.shipping_cost} shipping</span>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <span>•</span>
+                                          <span className="text-success">Free shipping</span>
+                                        </>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                  <div className="text-right">
+                                    <p className="font-semibold text-primary">
+                                      Rs. {listing.price.toLocaleString()}
+                                    </p>
+                                    <p className={`text-xs ${listing.stock > 10 ? 'text-success' : listing.stock > 0 ? 'text-warning' : 'text-destructive'}`}>
+                                      {listing.stock > 0 ? `${listing.stock} in stock` : 'Out of stock'}
+                                    </p>
+                                  </div>
+                                  <Button
+                                    size="sm"
+                                    variant={isListingSelected ? 'outline' : 'default'}
+                                    disabled={!compatibility.compatible || listing.stock === 0}
+                                    onClick={() => handleSelectProduct(product, listing.id, listing.price)}
+                                  >
+                                    {isListingSelected ? (
+                                      <Check className="h-4 w-4" />
+                                    ) : (
+                                      'Select'
+                                    )}
+                                  </Button>
+                                </div>
+                              </div>
+                            );
+                          })}
+                      </div>
+                    )}
+                  </div>
                 </div>
               );
             })}
