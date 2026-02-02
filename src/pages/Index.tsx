@@ -178,10 +178,10 @@ export default function Index() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <Cpu className="h-6 w-6 text-primary" />
-              <span className="font-bold gradient-text">PCBuilder</span>
+              <span className="font-bold gradient-text">PCForge</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              © 2024 PCBuilder. Final Year Project.
+              © 2024 PCForge. Final Year Project.
             </p>
           </div>
         </div>
