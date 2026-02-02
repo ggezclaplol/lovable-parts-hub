@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { api, Product } from '@/lib/api';
+import { useProducts, useCategories } from '@/hooks/useProducts';
 import { 
   PlusCircle, 
   Search, 
@@ -13,78 +13,12 @@ import {
   Monitor,
   HardDrive,
   MemoryStick,
-  Filter
+  Filter,
+  Star,
+  BadgeCheck,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
-
-// Mock products for demo
-const mockProducts: Product[] = [
-  {
-    id: '1',
-    name: 'RTX 4090 Graphics Card',
-    category: 'GPU',
-    price: 1599.99,
-    brand: 'NVIDIA',
-    description: 'The ultimate graphics card for gaming and content creation',
-    specs: { memory: '24GB GDDR6X', boost: '2.52 GHz' },
-    stock: 15,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    name: 'Core i9-14900K',
-    category: 'CPU',
-    price: 589.99,
-    brand: 'Intel',
-    description: 'Flagship desktop processor with 24 cores',
-    specs: { cores: '24 (8P+16E)', threads: '32' },
-    stock: 28,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: '3',
-    name: '32GB DDR5 RAM Kit',
-    category: 'RAM',
-    price: 189.99,
-    brand: 'Corsair',
-    description: 'High-speed DDR5 memory for enthusiast builds',
-    specs: { speed: '6000MHz', latency: 'CL36' },
-    stock: 45,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: '4',
-    name: '2TB NVMe SSD',
-    category: 'Storage',
-    price: 179.99,
-    brand: 'Samsung',
-    description: 'Ultra-fast PCIe 4.0 solid state drive',
-    specs: { read: '7000 MB/s', write: '5100 MB/s' },
-    stock: 62,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: '5',
-    name: 'Ryzen 9 7950X',
-    category: 'CPU',
-    price: 549.99,
-    brand: 'AMD',
-    description: '16-core processor for extreme performance',
-    specs: { cores: '16', threads: '32' },
-    stock: 20,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: '6',
-    name: 'RTX 4080 Super',
-    category: 'GPU',
-    price: 999.99,
-    brand: 'NVIDIA',
-    description: 'High-performance graphics for 4K gaming',
-    specs: { memory: '16GB GDDR6X', boost: '2.55 GHz' },
-    stock: 8,
-    createdAt: new Date().toISOString(),
-  },
-];
 
 const categoryIcons: Record<string, React.ElementType> = {
   GPU: Monitor,
@@ -93,32 +27,24 @@ const categoryIcons: Record<string, React.ElementType> = {
   Storage: HardDrive,
 };
 
-const categories = ['All', 'CPU', 'GPU', 'RAM', 'Storage'];
-
 export default function Products() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: products, isLoading: productsLoading } = useProducts();
+  const { data: categories, isLoading: categoriesLoading } = useCategories();
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [expandedProduct, setExpandedProduct] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function loadProducts() {
-      setIsLoading(true);
-      const response = await api.getProducts();
-      setProducts(response.data || mockProducts);
-      setFilteredProducts(response.data || mockProducts);
-      setIsLoading(false);
-    }
-    loadProducts();
-  }, []);
+  const isLoading = productsLoading || categoriesLoading;
 
-  useEffect(() => {
+  const filteredProducts = useMemo(() => {
+    if (!products) return [];
+
     let result = products;
 
     // Filter by category
     if (selectedCategory !== 'All') {
-      result = result.filter((p) => p.category === selectedCategory);
+      result = result.filter((p) => p.category?.name === selectedCategory);
     }
 
     // Filter by search query
@@ -128,12 +54,16 @@ export default function Products() {
         (p) =>
           p.name.toLowerCase().includes(query) ||
           p.brand.toLowerCase().includes(query) ||
-          p.description.toLowerCase().includes(query)
+          (p.description?.toLowerCase().includes(query) ?? false)
       );
     }
 
-    setFilteredProducts(result);
+    return result;
   }, [searchQuery, selectedCategory, products]);
+
+  const categoryOptions = useMemo(() => {
+    return ['All', ...(categories?.map((c) => c.name) || [])];
+  }, [categories]);
 
   if (isLoading) {
     return (
@@ -153,15 +83,9 @@ export default function Products() {
           <div>
             <h1 className="text-3xl font-bold">Products</h1>
             <p className="text-muted-foreground mt-1">
-              {filteredProducts.length} products available
+              {filteredProducts.length} products from multiple sellers
             </p>
           </div>
-          <Button variant="glow" asChild>
-            <Link to="/products/new">
-              <PlusCircle className="h-5 w-5" />
-              Add Product
-            </Link>
-          </Button>
         </div>
 
         {/* Filters */}
@@ -182,7 +106,7 @@ export default function Products() {
             <div className="flex items-center gap-2">
               <Filter className="h-5 w-5 text-muted-foreground" />
               <div className="flex gap-2 flex-wrap">
-                {categories.map((category) => (
+                {categoryOptions.map((category) => (
                   <Button
                     key={category}
                     variant={selectedCategory === category ? 'default' : 'outline'}
@@ -207,55 +131,130 @@ export default function Products() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {filteredProducts.map((product, index) => {
-              const IconComponent = categoryIcons[product.category] || Package;
+              const IconComponent = categoryIcons[product.category?.name || ''] || Package;
+              const isExpanded = expandedProduct === product.id;
+              const bestListing = product.listings.reduce(
+                (best, current) => (!best || current.price < best.price ? current : best),
+                product.listings[0]
+              );
+
               return (
                 <div
                   key={product.id}
-                  className="glass-effect rounded-xl p-6 hover:border-primary/30 transition-all duration-300 group animate-fade-in"
+                  className="glass-effect rounded-xl overflow-hidden hover:border-primary/30 transition-all duration-300 animate-fade-in"
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
-                  {/* Product Image Placeholder */}
-                  <div className="aspect-square rounded-lg bg-secondary/50 flex items-center justify-center mb-4 group-hover:bg-secondary transition-colors">
-                    <IconComponent className="h-16 w-16 text-primary/50 group-hover:text-primary transition-colors" />
-                  </div>
+                  <div className="p-6">
+                    <div className="flex gap-4">
+                      {/* Product Image */}
+                      <div className="w-24 h-24 shrink-0 rounded-lg bg-secondary/50 flex items-center justify-center">
+                        <IconComponent className="h-12 w-12 text-primary/50" />
+                      </div>
 
-                  {/* Product Info */}
-                  <div className="space-y-2">
-                    <div className="flex items-start justify-between gap-2">
-                      <h3 className="font-semibold line-clamp-2">{product.name}</h3>
-                      <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium shrink-0">
-                        {product.category}
-                      </span>
+                      {/* Product Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <h3 className="font-semibold text-lg line-clamp-1">{product.name}</h3>
+                            <p className="text-sm text-muted-foreground">{product.brand}</p>
+                          </div>
+                          {product.category && (
+                            <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium shrink-0">
+                              {product.category.name}
+                            </span>
+                          )}
+                        </div>
+
+                        <p className="text-sm text-muted-foreground line-clamp-2 mt-2">
+                          {product.description}
+                        </p>
+
+                        {/* Specs */}
+                        <div className="flex flex-wrap gap-2 mt-3">
+                          {Object.entries(product.specs).slice(0, 3).map(([key, value]) => (
+                            <span
+                              key={key}
+                              className="px-2 py-1 rounded-md bg-secondary text-xs text-muted-foreground"
+                            >
+                              {value}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
                     </div>
-                    <p className="text-sm text-muted-foreground">{product.brand}</p>
-                    <p className="text-sm text-muted-foreground line-clamp-2">
-                      {product.description}
-                    </p>
 
-                    {/* Specs */}
-                    <div className="flex flex-wrap gap-2 pt-2">
-                      {Object.entries(product.specs).slice(0, 2).map(([key, value]) => (
-                        <span
-                          key={key}
-                          className="px-2 py-1 rounded-md bg-secondary text-xs text-muted-foreground"
-                        >
-                          {value}
+                    {/* Price & Sellers Summary */}
+                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
+                      <div>
+                        <span className="text-2xl font-bold text-primary">
+                          ${product.lowest_price.toFixed(2)}
                         </span>
-                      ))}
-                    </div>
-
-                    {/* Price & Stock */}
-                    <div className="flex items-center justify-between pt-4 border-t border-border">
-                      <span className="text-2xl font-bold text-primary">
-                        ${product.price.toFixed(2)}
-                      </span>
-                      <span className={`text-sm ${product.stock > 10 ? 'text-success' : 'text-warning'}`}>
-                        {product.stock} in stock
-                      </span>
+                        <span className="text-sm text-muted-foreground ml-2">
+                          from {product.listings.length} seller{product.listings.length > 1 ? 's' : ''}
+                        </span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setExpandedProduct(isExpanded ? null : product.id)}
+                      >
+                        {isExpanded ? 'Hide' : 'Compare'} prices
+                        {isExpanded ? (
+                          <ChevronUp className="h-4 w-4 ml-1" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4 ml-1" />
+                        )}
+                      </Button>
                     </div>
                   </div>
+
+                  {/* Expanded Seller Listings */}
+                  {isExpanded && (
+                    <div className="border-t border-border bg-secondary/20 p-4 animate-fade-in">
+                      <h4 className="text-sm font-medium mb-3">All Sellers</h4>
+                      <div className="space-y-3">
+                        {product.listings
+                          .sort((a, b) => a.price - b.price)
+                          .map((listing) => (
+                            <div
+                              key={listing.id}
+                              className="flex items-center justify-between p-3 rounded-lg bg-card/50 border border-border"
+                            >
+                              <div className="flex items-center gap-3">
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium">{listing.seller.name}</span>
+                                    {listing.seller.verified && (
+                                      <BadgeCheck className="h-4 w-4 text-primary" />
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <Star className="h-3 w-3 fill-warning text-warning" />
+                                    <span>{listing.seller.rating.toFixed(1)}</span>
+                                    <span>•</span>
+                                    <span className="capitalize">{listing.condition}</span>
+                                    {listing.shipping_cost > 0 && (
+                                      <>
+                                        <span>•</span>
+                                        <span>+${listing.shipping_cost.toFixed(2)} shipping</span>
+                                      </>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className="font-semibold text-lg">${listing.price.toFixed(2)}</p>
+                                <p className={`text-xs ${listing.stock > 10 ? 'text-success' : listing.stock > 0 ? 'text-warning' : 'text-destructive'}`}>
+                                  {listing.stock > 0 ? `${listing.stock} in stock` : 'Out of stock'}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}
