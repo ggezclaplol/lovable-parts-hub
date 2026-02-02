@@ -1,16 +1,46 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { api, User } from '@/lib/api';
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: 'admin' | 'user';
+}
 
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  isAdmin: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  signup: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Demo credentials
+const DEMO_USERS: { email: string; password: string; user: User }[] = [
+  {
+    email: 'admin@demo.com',
+    password: 'admin123',
+    user: {
+      id: 'admin-001',
+      name: 'Admin User',
+      email: 'admin@demo.com',
+      role: 'admin',
+    },
+  },
+  {
+    email: 'user@demo.com',
+    password: 'user123',
+    user: {
+      id: 'user-001',
+      name: 'Demo User',
+      email: 'user@demo.com',
+      role: 'user',
+    },
+  },
+];
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -18,57 +48,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Check for existing session
-    const token = localStorage.getItem('token');
-    const savedUser = localStorage.getItem('user');
+    const savedUser = localStorage.getItem('demo_user');
     
-    if (token && savedUser) {
+    if (savedUser) {
       try {
         setUser(JSON.parse(savedUser));
       } catch {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        localStorage.removeItem('demo_user');
       }
     }
     setIsLoading(false);
   }, []);
 
   const login = async (email: string, password: string) => {
-    const response = await api.login(email, password);
-    
-    if (response.error) {
-      return { success: false, error: response.error };
-    }
+    // Simulate network delay
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
-    if (response.data) {
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      setUser(response.data.user);
+    const demoUser = DEMO_USERS.find(
+      (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password
+    );
+
+    if (demoUser) {
+      localStorage.setItem('demo_user', JSON.stringify(demoUser.user));
+      setUser(demoUser.user);
       return { success: true };
     }
 
-    return { success: false, error: 'Unknown error' };
-  };
-
-  const signup = async (name: string, email: string, password: string) => {
-    const response = await api.signup(name, email, password);
-    
-    if (response.error) {
-      return { success: false, error: response.error };
-    }
-
-    if (response.data) {
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      setUser(response.data.user);
-      return { success: true };
-    }
-
-    return { success: false, error: 'Unknown error' };
+    return { success: false, error: 'Invalid email or password. Try admin@demo.com / admin123 or user@demo.com / user123' };
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.removeItem('demo_user');
     setUser(null);
   };
 
@@ -78,8 +88,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         isLoading,
         isAuthenticated: !!user,
+        isAdmin: user?.role === 'admin',
         login,
-        signup,
         logout,
       }}
     >

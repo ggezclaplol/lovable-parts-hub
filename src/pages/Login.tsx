@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Cpu, Mail, Lock, Loader2, AlertCircle } from 'lucide-react';
+import { Cpu, Mail, Lock, Loader2, AlertCircle, Info } from 'lucide-react';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -14,6 +14,9 @@ export default function Login() {
   
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const from = (location.state as any)?.from?.pathname || '/';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,12 +26,23 @@ export default function Login() {
     const result = await login(email, password);
     
     if (result.success) {
-      navigate('/dashboard');
+      navigate(from, { replace: true });
     } else {
       setError(result.error || 'Login failed');
     }
     
     setIsLoading(false);
+  };
+
+  const fillDemoCredentials = (type: 'admin' | 'user') => {
+    if (type === 'admin') {
+      setEmail('admin@demo.com');
+      setPassword('admin123');
+    } else {
+      setEmail('user@demo.com');
+      setPassword('user123');
+    }
+    setError('');
   };
 
   return (
@@ -55,6 +69,32 @@ export default function Login() {
 
         {/* Form Card */}
         <div className="glass-effect rounded-2xl p-8 shadow-xl">
+          {/* Demo credentials helper */}
+          <div className="flex items-start gap-3 p-4 rounded-lg bg-primary/10 border border-primary/20 mb-6">
+            <Info className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <p className="font-medium text-primary mb-2">Demo Accounts</p>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => fillDemoCredentials('admin')}
+                >
+                  Admin
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => fillDemoCredentials('user')}
+                >
+                  User
+                </Button>
+              </div>
+            </div>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm animate-scale-in">
@@ -116,7 +156,7 @@ export default function Login() {
           <div className="mt-6 text-center text-sm text-muted-foreground">
             Don't have an account?{' '}
             <Link to="/signup" className="text-primary hover:underline font-medium">
-              Sign up
+              View demo info
             </Link>
           </div>
         </div>

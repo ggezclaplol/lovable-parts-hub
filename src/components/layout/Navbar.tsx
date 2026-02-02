@@ -1,10 +1,26 @@
-import { Link } from 'react-router-dom';
-import { Cpu, Menu, X, Package } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Cpu, Menu, X, Package, LogIn, LogOut, ShieldCheck, User } from 'lucide-react';
 import { useState } from 'react';
 import { CartSheet } from '@/components/cart/CartSheet';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   return (
     <nav className="sticky top-0 z-50 glass-effect border-b border-border/50">
@@ -19,7 +35,7 @@ export function Navbar() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-4">
             <Link 
               to="/products" 
               className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
@@ -27,7 +43,56 @@ export function Navbar() {
               <Package className="h-4 w-4" />
               Products
             </Link>
+            
+            {isAdmin && (
+              <Link 
+                to="/admin" 
+                className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <ShieldCheck className="h-4 w-4" />
+                Admin
+              </Link>
+            )}
+
             <CartSheet />
+
+            {isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="gap-2">
+                    <div className="p-1.5 rounded-full bg-primary/10">
+                      <User className="h-4 w-4 text-primary" />
+                    </div>
+                    <span className="hidden lg:inline">{user?.name}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <div className="px-2 py-1.5 text-sm">
+                    <p className="font-medium">{user?.name}</p>
+                    <p className="text-muted-foreground text-xs">{user?.email}</p>
+                    <p className="text-xs text-primary capitalize mt-1">{user?.role}</p>
+                  </div>
+                  <DropdownMenuSeparator />
+                  {isAdmin && (
+                    <DropdownMenuItem onClick={() => navigate('/admin')}>
+                      <ShieldCheck className="h-4 w-4 mr-2" />
+                      Admin Dashboard
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link to="/login">
+                <Button variant="outline" size="sm" className="gap-2">
+                  <LogIn className="h-4 w-4" />
+                  Login
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile: Cart + Menu */}
@@ -54,6 +119,45 @@ export function Navbar() {
                 <Package className="h-5 w-5 text-primary" />
                 Products
               </Link>
+              
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  className="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-secondary transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <ShieldCheck className="h-5 w-5 text-primary" />
+                  Admin Dashboard
+                </Link>
+              )}
+
+              {isAuthenticated ? (
+                <>
+                  <div className="px-4 py-3 border-t border-border mt-2">
+                    <p className="text-sm font-medium">{user?.name}</p>
+                    <p className="text-xs text-muted-foreground">{user?.email}</p>
+                  </div>
+                  <button
+                    className="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-destructive/10 text-destructive transition-colors"
+                    onClick={() => {
+                      handleLogout();
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    <LogOut className="h-5 w-5" />
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <Link
+                  to="/login"
+                  className="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-secondary transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <LogIn className="h-5 w-5 text-primary" />
+                  Login
+                </Link>
+              )}
             </div>
           </div>
         )}
