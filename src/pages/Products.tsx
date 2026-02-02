@@ -189,7 +189,7 @@ export default function Products() {
                     <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
                       <div>
                         <span className="text-2xl font-bold text-primary">
-                          ${product.lowest_price.toFixed(2)}
+                          Rs. {product.lowest_price.toLocaleString()}
                         </span>
                         <span className="text-sm text-muted-foreground ml-2">
                           from {product.listings.length} seller{product.listings.length > 1 ? 's' : ''}
@@ -238,14 +238,14 @@ export default function Products() {
                                     {listing.shipping_cost > 0 && (
                                       <>
                                         <span>•</span>
-                                        <span>+${listing.shipping_cost.toFixed(2)} shipping</span>
+                                        <span>+Rs. {listing.shipping_cost.toLocaleString()} shipping</span>
                                       </>
                                     )}
                                   </div>
                                 </div>
                               </div>
                               <div className="text-right">
-                                <p className="font-semibold text-lg">${listing.price.toFixed(2)}</p>
+                                <p className="font-semibold text-lg">Rs. {listing.price.toLocaleString()}</p>
                                 <p className={`text-xs ${listing.stock > 10 ? 'text-success' : listing.stock > 0 ? 'text-warning' : 'text-destructive'}`}>
                                   {listing.stock > 0 ? `${listing.stock} in stock` : 'Out of stock'}
                                 </p>
