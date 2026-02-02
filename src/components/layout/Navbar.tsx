@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Cpu, Menu, X, Package, LogIn, LogOut, ShieldCheck, User } from 'lucide-react';
+import { Cpu, Menu, X, Package, LogIn, LogOut, ShieldCheck, User, Wrench } from 'lucide-react';
 import { useState } from 'react';
 import { CartSheet } from '@/components/cart/CartSheet';
 import { useAuth } from '@/contexts/AuthContext';
@@ -42,6 +42,14 @@ export function Navbar() {
             >
               <Package className="h-4 w-4" />
               Products
+            </Link>
+            
+            <Link 
+              to="/build" 
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Wrench className="h-4 w-4" />
+              PC Builder
             </Link>
             
             {isAdmin && (
@@ -118,6 +126,15 @@ export function Navbar() {
               >
                 <Package className="h-5 w-5 text-primary" />
                 Products
+              </Link>
+              
+              <Link
+                to="/build"
+                className="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-secondary transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Wrench className="h-5 w-5 text-primary" />
+                PC Builder
               </Link>
               
               {isAdmin && (
