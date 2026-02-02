@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
+import { useCategories, useProducts } from '@/hooks/useProducts';
 import { 
   Cpu, 
   Monitor, 
@@ -9,15 +10,23 @@ import {
   ArrowRight, 
   Zap,
   Shield,
-  Truck
+  Truck,
+  CircuitBoard,
+  Box,
+  Fan,
+  Package
 } from 'lucide-react';
 
-const categories = [
-  { name: 'CPUs', icon: Cpu, count: 156 },
-  { name: 'Graphics Cards', icon: Monitor, count: 89 },
-  { name: 'Memory', icon: MemoryStick, count: 234 },
-  { name: 'Storage', icon: HardDrive, count: 178 },
-];
+const categoryIcons: Record<string, React.ElementType> = {
+  CPU: Cpu,
+  GPU: Monitor,
+  RAM: MemoryStick,
+  Storage: HardDrive,
+  Motherboard: CircuitBoard,
+  PSU: Zap,
+  Case: Box,
+  Cooling: Fan,
+};
 
 const features = [
   {
@@ -38,6 +47,15 @@ const features = [
 ];
 
 export default function Index() {
+  const { data: categories, isLoading: categoriesLoading } = useCategories();
+  const { data: products } = useProducts();
+
+  // Count products per category
+  const categoryCounts = categories?.map((cat) => ({
+    ...cat,
+    count: products?.filter((p) => p.category?.id === cat.id).length || 0,
+  }));
+
   return (
     <Layout>
       {/* Hero Section */}
@@ -58,19 +76,16 @@ export default function Index() {
             </h1>
             
             <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Pick the best PC components, compare prices, and create the ultimate build 
+              Pick the best PC components, compare prices from multiple sellers, and create the ultimate build 
               with our comprehensive part picker tool.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button variant="glow" size="xl" asChild>
-                <Link to="/signup">
-                  Start Building
+                <Link to="/products">
+                  Browse Parts
                   <ArrowRight className="h-5 w-5" />
                 </Link>
-              </Button>
-              <Button variant="outline" size="xl" asChild>
-                <Link to="/products">Browse Parts</Link>
               </Button>
             </div>
           </div>
@@ -86,21 +101,34 @@ export default function Index() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-          {categories.map((category, index) => (
-            <Link
-              key={category.name}
-              to="/products"
-              className="glass-effect rounded-xl p-6 text-center hover:border-primary/30 transition-all duration-300 group animate-fade-in"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                <category.icon className="h-8 w-8 text-primary" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
+          {categoriesLoading ? (
+            Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="glass-effect rounded-xl p-6 animate-pulse">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-secondary" />
+                <div className="h-4 bg-secondary rounded w-3/4 mx-auto mb-2" />
+                <div className="h-3 bg-secondary rounded w-1/2 mx-auto" />
               </div>
-              <h3 className="font-semibold mb-1">{category.name}</h3>
-              <p className="text-sm text-muted-foreground">{category.count} products</p>
-            </Link>
-          ))}
+            ))
+          ) : (
+            categoryCounts?.map((category, index) => {
+              const IconComponent = categoryIcons[category.name] || Package;
+              return (
+                <Link
+                  key={category.id}
+                  to="/products"
+                  className="glass-effect rounded-xl p-6 text-center hover:border-primary/30 transition-all duration-300 group animate-fade-in"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <IconComponent className="h-8 w-8 text-primary" />
+                  </div>
+                  <h3 className="font-semibold mb-1">{category.name}</h3>
+                  <p className="text-sm text-muted-foreground">{category.count} products</p>
+                </Link>
+              );
+            })
+          )}
         </div>
       </section>
 
@@ -132,12 +160,11 @@ export default function Index() {
           <div className="relative glass-effect rounded-2xl p-8 lg:p-12 text-center">
             <h2 className="text-3xl font-bold mb-4">Ready to Build?</h2>
             <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-              Join thousands of PC enthusiasts who trust PCBuilder for their builds.
-              Create your account and start building today.
+              Compare prices from multiple sellers and find the best deals on PC components.
             </p>
             <Button variant="glow" size="lg" asChild>
-              <Link to="/signup">
-                Create Free Account
+              <Link to="/products">
+                Start Building
                 <ArrowRight className="h-5 w-5" />
               </Link>
             </Button>
