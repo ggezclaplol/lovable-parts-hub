@@ -132,7 +132,7 @@ function BuildCard({ build, onEdit, onViewDetail }: { build: CommunityBuild; onE
       )}
 
       {/* Actions */}
-      <div className="flex items-center gap-3 pt-1">
+      <div className="flex items-center gap-3 pt-1" onClick={(e) => e.stopPropagation()}>
         <button
           onClick={() => {
             if (!isAuthenticated) return;
