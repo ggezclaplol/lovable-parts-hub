@@ -13,6 +13,7 @@ import Checkout from "./pages/Checkout";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import AdminDashboard from "./pages/AdminDashboard";
+import AIBuilder from "./pages/AIBuilder";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
