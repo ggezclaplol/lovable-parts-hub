@@ -14,6 +14,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import AdminDashboard from "./pages/AdminDashboard";
 import AIBuilder from "./pages/AIBuilder";
+import CommunityBuilds from "./pages/CommunityBuilds";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
