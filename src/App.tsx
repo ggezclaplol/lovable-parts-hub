@@ -35,6 +35,8 @@ const App = () => (
             <Route path="/build" element={<PCBuilder />} />
             <Route path="/ai-builder" element={<AIBuilder />} />
             <Route path="/community" element={<CommunityBuilds />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/support" element={<Support />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
