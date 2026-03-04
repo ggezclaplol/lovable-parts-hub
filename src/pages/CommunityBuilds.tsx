@@ -60,7 +60,7 @@ function BuildCard({ build, onEdit, onViewDetail }: { build: CommunityBuild; onE
   const isOwner = user?.id === build.user_id;
 
   return (
-    <div className="bento-card overflow-hidden flex flex-col animate-fade-in">
+    <div className="bento-card overflow-hidden flex flex-col animate-fade-in cursor-pointer hover:border-primary/30 transition-colors" onClick={() => onViewDetail?.(build)}>
       {/* Build Image */}
       {build.image_url && (
         <div className="w-full h-48 overflow-hidden">
