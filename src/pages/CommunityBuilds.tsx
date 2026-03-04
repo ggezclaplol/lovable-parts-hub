@@ -193,18 +193,81 @@ function BuildCard({ build, onEdit, onViewDetail }: { build: CommunityBuild; onE
 
       {/* Parts */}
       {build.parts.length > 0 && (
-        <div className="space-y-1.5">
-          {(expanded ? build.parts : build.parts.slice(0, 3)).map((part, i) => (
-            <div key={i} className="flex items-center justify-between text-sm px-3 py-1.5 rounded-lg bg-secondary/50">
-              <span className="truncate">
-                <span className="text-muted-foreground mr-2">{part.category}</span>
-                {part.name}
-              </span>
-              <span className="font-mono text-xs text-primary shrink-0 ml-2">
-                ₨{part.price.toLocaleString()}
-              </span>
-            </div>
-          ))}
+        <div className="space-y-1.5" onClick={(e) => e.stopPropagation()}>
+          {(expanded ? build.parts : build.parts.slice(0, 3)).map((part, i) => {
+            const detail = part.product_id ? partDetails[part.product_id] : null;
+            const Icon = categoryIcons[part.category] || Package;
+
+            return (
+              <Collapsible key={i}>
+                <div className="rounded-lg border border-border/50 bg-secondary/50 overflow-hidden">
+                  <CollapsibleTrigger className="w-full">
+                    <div className="flex items-center gap-2 px-3 py-1.5 text-sm hover:bg-secondary/80 transition-colors">
+                      <Icon className="h-3.5 w-3.5 text-primary shrink-0" />
+                      <span className="truncate text-left flex-1">
+                        <span className="text-muted-foreground mr-1.5">{part.category}</span>
+                        {part.name}
+                      </span>
+                      <span className="font-mono text-xs text-primary shrink-0 ml-2">
+                        ₨{part.price.toLocaleString()}
+                      </span>
+                      {detail && <ChevronDown className="h-3 w-3 shrink-0 text-muted-foreground transition-transform duration-200" />}
+                    </div>
+                  </CollapsibleTrigger>
+
+                  {detail && (
+                    <CollapsibleContent>
+                      <div className="border-t border-border/50 px-3 py-2.5 bg-background/50 space-y-2 text-xs">
+                        {detail.specs && Object.keys(detail.specs).length > 0 && (
+                          <div>
+                            <p className="font-medium text-muted-foreground mb-1">Specs</p>
+                            <div className="grid grid-cols-2 gap-x-3 gap-y-0.5">
+                              {Object.entries(detail.specs).map(([key, value]) => (
+                                <div key={key} className="flex justify-between">
+                                  <span className="text-muted-foreground capitalize">{key.replace(/_/g, ' ')}</span>
+                                  <span className="font-medium text-foreground">{String(value)}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {detail.listing && (
+                          <div>
+                            <p className="font-medium text-muted-foreground mb-1">Seller</p>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-medium">{detail.listing.seller.name}</span>
+                                {detail.listing.seller.verified && <BadgeCheck className="h-3 w-3 text-primary" />}
+                                {detail.listing.seller.rating && (
+                                  <span className="flex items-center gap-0.5 text-muted-foreground">
+                                    <Star className="h-2.5 w-2.5 fill-warning text-warning" />
+                                    {detail.listing.seller.rating.toFixed(1)}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2 text-muted-foreground">
+                                <span>Current: ₨{detail.listing.price.toLocaleString()}</span>
+                                {detail.listing.shipping_cost && detail.listing.shipping_cost > 0 ? (
+                                  <span>+₨{detail.listing.shipping_cost} ship</span>
+                                ) : (
+                                  <span className="text-green-500">Free ship</span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {detail.description && (
+                          <p className="text-muted-foreground leading-relaxed">{detail.description}</p>
+                        )}
+                      </div>
+                    </CollapsibleContent>
+                  )}
+                </div>
+              </Collapsible>
+            );
+          })}
           {build.parts.length > 3 && (
             <button
               onClick={() => setExpanded(!expanded)}
