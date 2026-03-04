@@ -295,18 +295,9 @@ function BuildFormDialog({
     if (editBuild?.image_url) setRemoveExistingImage(true);
   };
 
+
   const totalPrice = parts.reduce((sum, p) => sum + (Number(p.price) || 0), 0);
   const isPending = createBuild.isPending || updateBuild.isPending;
-
-  const resetForm = () => {
-    setTitle('');
-    setDescription('');
-    setUseCase('gaming');
-    setParts([{ name: '', category: 'CPU', price: 0 }]);
-    setImage(null);
-    setImagePreview(null);
-    setRemoveExistingImage(false);
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
