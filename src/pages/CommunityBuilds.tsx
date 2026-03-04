@@ -75,11 +75,79 @@ const categoryIcons: Record<string, React.ElementType> = {
   Cooling: Fan,
 };
 
+interface PartProductDetail {
+  name: string;
+  brand: string;
+  description: string | null;
+  specs: Record<string, any> | null;
+  listing?: {
+    price: number;
+    condition: string | null;
+    stock: number;
+    shipping_cost: number | null;
+    seller: { name: string; rating: number | null; verified: boolean | null };
+  };
+}
+
 function BuildCard({ build, onEdit, onViewDetail }: { build: CommunityBuild; onEdit?: (build: CommunityBuild) => void; onViewDetail?: (build: CommunityBuild) => void }) {
   const { isAuthenticated, user } = useAuth();
   const toggleLike = useToggleLike();
   const deleteBuild = useDeleteBuild();
   const [showComments, setShowComments] = useState(false);
+  const [partDetails, setPartDetails] = useState<Record<string, PartProductDetail>>({});
+  const [detailsLoaded, setDetailsLoaded] = useState(false);
+
+  useEffect(() => {
+    const productIds = build.parts.filter(p => p.product_id).map(p => p.product_id!);
+    if (productIds.length === 0) { setDetailsLoaded(true); return; }
+
+    (async () => {
+      try {
+        const { data: products } = await supabase
+          .from('products')
+          .select('id, name, brand, description, specs')
+          .in('id', productIds);
+
+        const listingIds = build.parts.filter(p => p.listing_id).map(p => p.listing_id!);
+        let listingsMap: Record<string, any> = {};
+        if (listingIds.length > 0) {
+          const { data: listings } = await supabase
+            .from('product_listings')
+            .select('id, price, condition, stock, shipping_cost, seller_id')
+            .in('id', listingIds);
+          if (listings && listings.length > 0) {
+            const sellerIds = [...new Set(listings.map(l => l.seller_id))];
+            const { data: sellers } = await supabase
+              .from('sellers')
+              .select('id, name, rating, verified')
+              .in('id', sellerIds);
+            const sellersMap = Object.fromEntries((sellers || []).map(s => [s.id, s]));
+            for (const listing of listings) {
+              listingsMap[listing.id] = { ...listing, seller: sellersMap[listing.seller_id] || { name: 'Unknown', rating: null, verified: false } };
+            }
+          }
+        }
+
+        const details: Record<string, PartProductDetail> = {};
+        for (const product of products || []) {
+          const part = build.parts.find(p => p.product_id === product.id);
+          const listing = part?.listing_id ? listingsMap[part.listing_id] : undefined;
+          details[product.id] = {
+            name: product.name,
+            brand: product.brand,
+            description: product.description,
+            specs: product.specs as Record<string, any> | null,
+            listing: listing ? { price: listing.price, condition: listing.condition, stock: listing.stock, shipping_cost: listing.shipping_cost, seller: listing.seller } : undefined,
+          };
+        }
+        setPartDetails(details);
+      } catch (err) {
+        console.error('Failed to fetch part details for card', err);
+      } finally {
+        setDetailsLoaded(true);
+      }
+    })();
+  }, [build.parts]);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const useCaseInfo = USE_CASES.find((u) => u.value === build.use_case) || USE_CASES[USE_CASES.length - 1];
