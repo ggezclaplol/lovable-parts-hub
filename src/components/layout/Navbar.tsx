@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Cpu, Menu, X, Package, LogIn, LogOut, ShieldCheck, User, Wrench } from 'lucide-react';
+import { Cpu, Menu, X, Package, LogIn, LogOut, ShieldCheck, User, Wrench, Sun, Moon } from 'lucide-react';
 import { useState } from 'react';
+import { useTheme } from '@/contexts/ThemeContext';
 import { CartSheet } from '@/components/cart/CartSheet';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
