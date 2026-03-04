@@ -174,12 +174,11 @@ export default function Index() {
 
           categoryCounts?.map((category, index) => {
             const IconComponent = categoryIcons[category.name] || Package;
-            const isWide = index === 0 || index === 5;
             return (
               <Link
                 key={category.id}
                 to="/products"
-                className={`bento-card p-5 group animate-fade-in ${isWide ? 'md:col-span-3 lg:col-span-4' : 'md:col-span-2 lg:col-span-2'}`}
+                className="bento-card p-5 group animate-fade-in md:col-span-3 lg:col-span-3"
                 style={{ animationDelay: `${(index + 3) * 60}ms` }}>
                 
                   <div className="w-10 h-10 mb-3 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
