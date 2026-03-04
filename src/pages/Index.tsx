@@ -17,7 +17,8 @@ import {
   Package,
   Sparkles,
   Wrench,
-  TrendingUp
+  TrendingUp,
+  Users,
 } from 'lucide-react';
 
 const categoryIcons: Record<string, React.ElementType> = {
