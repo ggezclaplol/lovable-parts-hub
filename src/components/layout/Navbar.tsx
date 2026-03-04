@@ -23,15 +23,15 @@ export function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/40">
+    <nav className="sticky top-0 z-50 glass-effect border-b border-border/30">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="p-2 rounded-xl bg-primary/10 group-hover:bg-primary/15 transition-colors">
+            <div className="p-2 rounded-xl bg-primary/10 neon-border group-hover:bg-primary/20 transition-all">
               <Cpu className="h-5 w-5 text-primary" />
             </div>
-            <span className="text-xl font-serif font-bold text-foreground">PCForge</span>
+            <span className="text-xl font-display font-bold gradient-text">PCForge</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -62,7 +62,7 @@ export function Navbar() {
               </Link>
             )}
 
-            <div className="w-px h-6 bg-border mx-2" />
+            <div className="w-px h-6 bg-border/50 mx-2" />
 
             <CartSheet />
 
@@ -70,7 +70,7 @@ export function Navbar() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="gap-2">
-                    <div className="p-1.5 rounded-full bg-primary/10">
+                    <div className="p-1.5 rounded-full bg-primary/15 neon-border">
                       <User className="h-4 w-4 text-primary" />
                     </div>
                     <span className="hidden lg:inline text-sm">{user?.name}</span>
@@ -97,7 +97,7 @@ export function Navbar() {
               </DropdownMenu>
             ) : (
               <Link to="/login">
-                <Button variant="default" size="sm" className="gap-2 rounded-full px-5">
+                <Button variant="glow" size="sm" className="gap-2 rounded-full px-5">
                   <LogIn className="h-4 w-4" />
                   Login
                 </Button>
@@ -105,7 +105,7 @@ export function Navbar() {
             )}
           </div>
 
-          {/* Mobile: Cart + Menu */}
+          {/* Mobile */}
           <div className="md:hidden flex items-center gap-2">
             <CartSheet />
             <button
@@ -117,62 +117,36 @@ export function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-border/40 animate-fade-in">
+          <div className="md:hidden py-4 border-t border-border/30 animate-fade-in">
             <div className="flex flex-col gap-1">
-              <Link
-                to="/products"
-                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary/60 transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
+              <Link to="/products" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary/60 transition-colors" onClick={() => setMobileMenuOpen(false)}>
                 <Package className="h-5 w-5 text-primary" />
                 <span className="font-medium">Products</span>
               </Link>
-              
-              <Link
-                to="/build"
-                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary/60 transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
+              <Link to="/build" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary/60 transition-colors" onClick={() => setMobileMenuOpen(false)}>
                 <Wrench className="h-5 w-5 text-primary" />
                 <span className="font-medium">PC Builder</span>
               </Link>
-              
               {isAdmin && (
-                <Link
-                  to="/admin"
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary/60 transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
+                <Link to="/admin" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary/60 transition-colors" onClick={() => setMobileMenuOpen(false)}>
                   <ShieldCheck className="h-5 w-5 text-primary" />
                   <span className="font-medium">Admin Dashboard</span>
                 </Link>
               )}
-
               {isAuthenticated ? (
                 <>
-                  <div className="px-4 py-3 border-t border-border/40 mt-2">
+                  <div className="px-4 py-3 border-t border-border/30 mt-2">
                     <p className="font-medium">{user?.name}</p>
                     <p className="text-xs text-muted-foreground">{user?.email}</p>
                   </div>
-                  <button
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-destructive/10 text-destructive transition-colors"
-                    onClick={() => {
-                      handleLogout();
-                      setMobileMenuOpen(false);
-                    }}
-                  >
+                  <button className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-destructive/10 text-destructive transition-colors" onClick={() => { handleLogout(); setMobileMenuOpen(false); }}>
                     <LogOut className="h-5 w-5" />
                     <span className="font-medium">Logout</span>
                   </button>
                 </>
               ) : (
-                <Link
-                  to="/login"
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary/60 transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
+                <Link to="/login" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary/60 transition-colors" onClick={() => setMobileMenuOpen(false)}>
                   <LogIn className="h-5 w-5 text-primary" />
                   <span className="font-medium">Login</span>
                 </Link>
