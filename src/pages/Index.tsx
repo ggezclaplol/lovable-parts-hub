@@ -194,7 +194,7 @@ export default function Index() {
 
           {/* Features row */}
           {/* Features row - separated cards */}
-          <div className="md:col-span-6 lg:col-span-12 grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-5">
+          <div className="md:col-span-6 lg:col-span-12 grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-5 [&>*]:min-w-0">
             {[
               { icon: Zap, title: 'Lightning Fast', desc: 'Compare specs & prices instantly' },
               { icon: Shield, title: 'Compatibility', desc: 'Auto-verify all selected parts' },
