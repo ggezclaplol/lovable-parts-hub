@@ -158,6 +158,10 @@ export function Navbar() {
                 <Sparkles className="h-5 w-5 text-primary" />
                 <span className="font-medium">AI Builder</span>
               </Link>
+              <Link to="/community" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary/60 transition-colors" onClick={() => setMobileMenuOpen(false)}>
+                <Users className="h-5 w-5 text-primary" />
+                <span className="font-medium">Community</span>
+              </Link>
               {isAdmin && (
                 <Link to="/admin" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary/60 transition-colors" onClick={() => setMobileMenuOpen(false)}>
                   <ShieldCheck className="h-5 w-5 text-primary" />
