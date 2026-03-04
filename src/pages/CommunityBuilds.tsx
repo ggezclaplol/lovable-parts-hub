@@ -219,6 +219,8 @@ function CreateBuildDialog() {
   const [description, setDescription] = useState('');
   const [useCase, setUseCase] = useState('gaming');
   const [parts, setParts] = useState<BuildPart[]>([{ name: '', category: 'CPU', price: 0 }]);
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const createBuild = useCreateBuild();
 
   const addPart = () => setParts([...parts, { name: '', category: 'GPU', price: 0 }]);
@@ -227,6 +229,23 @@ function CreateBuildDialog() {
     const updated = [...parts];
     (updated[index] as any)[field] = value;
     setParts(updated);
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        return; // Max 5MB
+      }
+      setImage(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const removeImage = () => {
+    setImage(null);
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
+    setImagePreview(null);
   };
 
   const totalPrice = parts.reduce((sum, p) => sum + (Number(p.price) || 0), 0);
@@ -241,6 +260,7 @@ function CreateBuildDialog() {
         use_case: useCase,
         parts: validParts,
         total_price: totalPrice,
+        image: image || undefined,
       },
       {
         onSuccess: () => {
@@ -248,6 +268,7 @@ function CreateBuildDialog() {
           setTitle('');
           setDescription('');
           setParts([{ name: '', category: 'CPU', price: 0 }]);
+          removeImage();
         },
       }
     );
