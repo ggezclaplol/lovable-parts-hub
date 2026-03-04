@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { supabase } from '@/integrations/supabase/client';
 import { type CommunityBuild, type BuildPart, USE_CASES } from '@/hooks/useCommunityBuilds';
 import { formatDistanceToNow } from 'date-fns';
@@ -17,6 +18,7 @@ import {
   Box,
   Fan,
   Monitor,
+  ChevronDown,
 } from 'lucide-react';
 
 const categoryIcons: Record<string, React.ElementType> = {
