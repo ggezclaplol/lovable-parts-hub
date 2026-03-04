@@ -17,6 +17,7 @@ import AIBuilder from "./pages/AIBuilder";
 import CommunityBuilds from "./pages/CommunityBuilds";
 import About from "./pages/About";
 import Support from "./pages/Support";
+import Account from "./pages/Account";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
