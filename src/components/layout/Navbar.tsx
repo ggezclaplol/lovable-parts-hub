@@ -186,6 +186,14 @@ export function Navbar() {
                     <p className="font-medium">{user?.name}</p>
                     <p className="text-xs text-muted-foreground">{user?.email}</p>
                   </div>
+                  <Link to="/account" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary/60 transition-colors" onClick={() => setMobileMenuOpen(false)}>
+                    <UserCog className="h-5 w-5 text-primary" />
+                    <span className="font-medium">My Account</span>
+                  </Link>
+                  <Link to="/account?tab=orders" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary/60 transition-colors" onClick={() => setMobileMenuOpen(false)}>
+                    <ShoppingBag className="h-5 w-5 text-primary" />
+                    <span className="font-medium">My Orders</span>
+                  </Link>
                   <button className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-destructive/10 text-destructive transition-colors" onClick={() => { handleLogout(); setMobileMenuOpen(false); }}>
                     <LogOut className="h-5 w-5" />
                     <span className="font-medium">Logout</span>
