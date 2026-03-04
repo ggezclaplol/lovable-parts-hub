@@ -238,6 +238,11 @@ export default function Index() {
               </div>
               <span className="font-display font-bold text-lg gradient-text">PCForge</span>
             </div>
+            <div className="flex items-center gap-6 text-sm text-muted-foreground">
+              <Link to="/about" className="hover:text-foreground transition-colors">About Us</Link>
+              <Link to="/support" className="hover:text-foreground transition-colors">Support</Link>
+              <Link to="/community" className="hover:text-foreground transition-colors">Community</Link>
+            </div>
             <p className="text-sm text-muted-foreground font-mono">
               © 2024 PCForge — Final Year Project
             </p>
