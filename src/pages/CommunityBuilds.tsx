@@ -225,15 +225,38 @@ function CommentsSection({ buildId }: { buildId: string }) {
   );
 }
 
-function CreateBuildDialog() {
-  const [open, setOpen] = useState(false);
+function BuildFormDialog({
+  open,
+  onOpenChange,
+  editBuild,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  editBuild?: CommunityBuild | null;
+}) {
+  const isEdit = !!editBuild;
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [useCase, setUseCase] = useState('gaming');
   const [parts, setParts] = useState<BuildPart[]>([{ name: '', category: 'CPU', price: 0 }]);
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [removeExistingImage, setRemoveExistingImage] = useState(false);
   const createBuild = useCreateBuild();
+  const updateBuild = useUpdateBuild();
+
+  // Populate form when editing
+  useState(() => {
+    if (editBuild) {
+      setTitle(editBuild.title);
+      setDescription(editBuild.description);
+      setUseCase(editBuild.use_case);
+      setParts(editBuild.parts.length > 0 ? editBuild.parts : [{ name: '', category: 'CPU', price: 0 }]);
+      if (editBuild.image_url) {
+        setImagePreview(editBuild.image_url);
+      }
+    }
+  });
 
   const addPart = () => setParts([...parts, { name: '', category: 'GPU', price: 0 }]);
   const removePart = (index: number) => setParts(parts.filter((_, i) => i !== index));
@@ -246,59 +269,86 @@ function CreateBuildDialog() {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        return; // Max 5MB
-      }
+      if (file.size > 5 * 1024 * 1024) return;
       setImage(file);
+      setRemoveExistingImage(false);
       setImagePreview(URL.createObjectURL(file));
     }
   };
 
   const removeImage = () => {
     setImage(null);
-    if (imagePreview) URL.revokeObjectURL(imagePreview);
+    if (imagePreview && !editBuild?.image_url) URL.revokeObjectURL(imagePreview);
     setImagePreview(null);
+    if (editBuild?.image_url) setRemoveExistingImage(true);
   };
 
   const totalPrice = parts.reduce((sum, p) => sum + (Number(p.price) || 0), 0);
+  const isPending = createBuild.isPending || updateBuild.isPending;
+
+  const resetForm = () => {
+    setTitle('');
+    setDescription('');
+    setUseCase('gaming');
+    setParts([{ name: '', category: 'CPU', price: 0 }]);
+    setImage(null);
+    setImagePreview(null);
+    setRemoveExistingImage(false);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const validParts = parts.filter((p) => p.name.trim());
-    createBuild.mutate(
-      {
-        title,
-        description,
-        use_case: useCase,
-        parts: validParts,
-        total_price: totalPrice,
-        image: image || undefined,
-      },
-      {
-        onSuccess: () => {
-          setOpen(false);
-          setTitle('');
-          setDescription('');
-          setParts([{ name: '', category: 'CPU', price: 0 }]);
-          removeImage();
+
+    if (isEdit && editBuild) {
+      updateBuild.mutate(
+        {
+          id: editBuild.id,
+          title,
+          description,
+          use_case: useCase,
+          parts: validParts,
+          total_price: totalPrice,
+          image: image || undefined,
+          existing_image_url: editBuild.image_url,
+          remove_image: removeExistingImage,
         },
-      }
-    );
+        {
+          onSuccess: () => {
+            onOpenChange(false);
+            resetForm();
+          },
+        }
+      );
+    } else {
+      createBuild.mutate(
+        {
+          title,
+          description,
+          use_case: useCase,
+          parts: validParts,
+          total_price: totalPrice,
+          image: image || undefined,
+        },
+        {
+          onSuccess: () => {
+            onOpenChange(false);
+            resetForm();
+          },
+        }
+      );
+    }
   };
 
   const categories = ['CPU', 'GPU', 'RAM', 'Motherboard', 'Storage', 'PSU', 'Case', 'Cooling', 'Other'];
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="glow" className="gap-2">
-          <Plus className="h-4 w-4" />
-          Share Your Build
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) resetForm(); }}>
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-display text-xl">Share Your PC Build</DialogTitle>
+          <DialogTitle className="font-display text-xl">
+            {isEdit ? 'Edit Your Build' : 'Share Your PC Build'}
+          </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-5 mt-2">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -418,13 +468,13 @@ function CreateBuildDialog() {
             )}
           </div>
 
-          <Button type="submit" variant="glow" className="w-full" disabled={createBuild.isPending}>
-            {createBuild.isPending ? (
+          <Button type="submit" variant="glow" className="w-full" disabled={isPending}>
+            {isPending ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" /> Sharing...
+                <Loader2 className="h-4 w-4 animate-spin" /> {isEdit ? 'Updating...' : 'Sharing...'}
               </>
             ) : (
-              'Share Build'
+              isEdit ? 'Update Build' : 'Share Build'
             )}
           </Button>
         </form>
