@@ -143,6 +143,7 @@ function BuildCard({ build }: { build: CommunityBuild }) {
 
       {/* Comments Section */}
       {showComments && <CommentsSection buildId={build.id} />}
+      </div>
     </div>
   );
 }
