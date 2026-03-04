@@ -146,6 +146,10 @@ export function Navbar() {
                 <Wrench className="h-5 w-5 text-primary" />
                 <span className="font-medium">PC Builder</span>
               </Link>
+              <Link to="/ai-builder" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary/60 transition-colors" onClick={() => setMobileMenuOpen(false)}>
+                <Sparkles className="h-5 w-5 text-primary" />
+                <span className="font-medium">AI Builder</span>
+              </Link>
               {isAdmin && (
                 <Link to="/admin" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary/60 transition-colors" onClick={() => setMobileMenuOpen(false)}>
                   <ShieldCheck className="h-5 w-5 text-primary" />
