@@ -629,10 +629,12 @@ export default function CommunityBuilds() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {builds?.map((build) => (
-              <BuildCard key={build.id} build={build} onEdit={handleEdit} />
+              <BuildCard key={build.id} build={build} onEdit={handleEdit} onViewDetail={(b) => setDetailBuild(b)} />
             ))}
           </div>
         )}
+
+        <BuildDetailDialog build={detailBuild} open={!!detailBuild} onOpenChange={(open) => { if (!open) setDetailBuild(null); }} />
       </div>
     </Layout>
   );
