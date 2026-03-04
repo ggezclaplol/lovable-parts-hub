@@ -4,6 +4,7 @@ import { BuildDetailDialog } from '@/components/community/BuildDetailDialog';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useProducts, type ProductWithListings } from '@/hooks/useProducts';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import {
@@ -271,6 +272,7 @@ function BuildFormDialog({
   editBuild?: CommunityBuild | null;
 }) {
   const isEdit = !!editBuild;
+  const { data: allProducts } = useProducts();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [useCase, setUseCase] = useState('gaming');
@@ -280,6 +282,27 @@ function BuildFormDialog({
   const [removeExistingImage, setRemoveExistingImage] = useState(false);
   const createBuild = useCreateBuild();
   const updateBuild = useUpdateBuild();
+
+  const categories = ['CPU', 'GPU', 'RAM', 'Motherboard', 'Storage', 'PSU', 'Case', 'Cooling', 'Other'];
+
+  // Map category names used in form to category names in DB
+  const categoryMap: Record<string, string> = {
+    'CPU': 'CPUs',
+    'GPU': 'GPUs',
+    'RAM': 'RAM',
+    'Motherboard': 'Motherboards',
+    'Storage': 'Storage',
+    'PSU': 'Power Supplies',
+    'Case': 'PC Cases',
+    'Cooling': 'Cooling',
+  };
+
+  const getProductsForCategory = (cat: string): ProductWithListings[] => {
+    if (!allProducts) return [];
+    const dbCat = categoryMap[cat];
+    if (!dbCat) return [];
+    return allProducts.filter(p => p.category?.name === dbCat);
+  };
 
   const resetForm = () => {
     setTitle('');
@@ -291,7 +314,6 @@ function BuildFormDialog({
     setRemoveExistingImage(false);
   };
 
-  // Populate form when editing
   useEffect(() => {
     if (editBuild && open) {
       setTitle(editBuild.title);
@@ -308,9 +330,32 @@ function BuildFormDialog({
 
   const addPart = () => setParts([...parts, { name: '', category: 'GPU', price: 0 }]);
   const removePart = (index: number) => setParts(parts.filter((_, i) => i !== index));
-  const updatePart = (index: number, field: keyof BuildPart, value: string | number) => {
+
+  const handleSelectProduct = (index: number, product: ProductWithListings) => {
     const updated = [...parts];
-    (updated[index] as any)[field] = value;
+    const bestListing = product.listings.reduce(
+      (best, cur) => (!best || cur.price < best.price ? cur : best),
+      product.listings[0]
+    );
+    updated[index] = {
+      ...updated[index],
+      name: product.name,
+      product_id: product.id,
+      listing_id: bestListing?.id,
+      seller_name: bestListing?.seller.name,
+    };
+    setParts(updated);
+  };
+
+  const updatePartCategory = (index: number, category: string) => {
+    const updated = [...parts];
+    updated[index] = { name: '', category, price: 0 };
+    setParts(updated);
+  };
+
+  const updatePartPrice = (index: number, price: number) => {
+    const updated = [...parts];
+    updated[index] = { ...updated[index], price };
     setParts(updated);
   };
 
@@ -330,7 +375,6 @@ function BuildFormDialog({
     setImagePreview(null);
     if (editBuild?.image_url) setRemoveExistingImage(true);
   };
-
 
   const totalPrice = parts.reduce((sum, p) => sum + (Number(p.price) || 0), 0);
   const isPending = createBuild.isPending || updateBuild.isPending;
@@ -352,12 +396,7 @@ function BuildFormDialog({
           existing_image_url: editBuild.image_url,
           remove_image: removeExistingImage,
         },
-        {
-          onSuccess: () => {
-            onOpenChange(false);
-            resetForm();
-          },
-        }
+        { onSuccess: () => { onOpenChange(false); resetForm(); } }
       );
     } else {
       createBuild.mutate(
@@ -369,17 +408,10 @@ function BuildFormDialog({
           total_price: totalPrice,
           image: image || undefined,
         },
-        {
-          onSuccess: () => {
-            onOpenChange(false);
-            resetForm();
-          },
-        }
+        { onSuccess: () => { onOpenChange(false); resetForm(); } }
       );
     }
   };
-
-  const categories = ['CPU', 'GPU', 'RAM', 'Motherboard', 'Storage', 'PSU', 'Case', 'Cooling', 'Other'];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -456,6 +488,7 @@ function BuildFormDialog({
             )}
           </div>
 
+          {/* Parts List - Product Picker */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <Label>Parts List</Label>
@@ -463,43 +496,103 @@ function BuildFormDialog({
                 <Plus className="h-3 w-3" /> Add Part
               </Button>
             </div>
-            {parts.map((part, i) => (
-              <div key={i} className="flex gap-2 items-start">
-                <Select
-                  value={part.category}
-                  onValueChange={(v) => updatePart(i, 'category', v)}
-                >
-                  <SelectTrigger className="w-[130px] shrink-0">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((c) => (
-                      <SelectItem key={c} value={c}>{c}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Input
-                  value={part.name}
-                  onChange={(e) => updatePart(i, 'name', e.target.value)}
-                  placeholder="Component name"
-                  className="flex-1"
-                  maxLength={100}
-                />
-                <Input
-                  type="number"
-                  value={part.price || ''}
-                  onChange={(e) => updatePart(i, 'price', Number(e.target.value))}
-                  placeholder="Price"
-                  className="w-24 shrink-0"
-                  min={0}
-                />
-                {parts.length > 1 && (
-                  <Button type="button" variant="ghost" size="icon" onClick={() => removePart(i)} className="shrink-0">
-                    <Trash2 className="h-4 w-4 text-muted-foreground" />
-                  </Button>
-                )}
-              </div>
-            ))}
+            {parts.map((part, i) => {
+              const availableProducts = getProductsForCategory(part.category);
+              const selectedProduct = allProducts?.find(p => p.id === part.product_id);
+              const currentPrice = selectedProduct?.lowest_price;
+
+              return (
+                <div key={i} className="rounded-lg border border-border bg-card/50 p-3 space-y-2">
+                  <div className="flex gap-2 items-center">
+                    {/* Category */}
+                    <Select
+                      value={part.category}
+                      onValueChange={(v) => updatePartCategory(i, v)}
+                    >
+                      <SelectTrigger className="w-[120px] shrink-0">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories.map((c) => (
+                          <SelectItem key={c} value={c}>{c}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    {/* Product Picker */}
+                    {part.category !== 'Other' && availableProducts.length > 0 ? (
+                      <Select
+                        value={part.product_id || ''}
+                        onValueChange={(productId) => {
+                          const product = availableProducts.find(p => p.id === productId);
+                          if (product) handleSelectProduct(i, product);
+                        }}
+                      >
+                        <SelectTrigger className="flex-1">
+                          <SelectValue placeholder="Select a product..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableProducts.map((product) => (
+                            <SelectItem key={product.id} value={product.id}>
+                              <span className="flex items-center gap-2">
+                                {product.brand} {product.name}
+                                {product.lowest_price > 0 && (
+                                  <span className="text-xs text-muted-foreground">
+                                    — ₨{product.lowest_price.toLocaleString()}
+                                  </span>
+                                )}
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <Input
+                        value={part.name}
+                        onChange={(e) => {
+                          const updated = [...parts];
+                          updated[i] = { ...updated[i], name: e.target.value, product_id: undefined, listing_id: undefined, seller_name: undefined };
+                          setParts(updated);
+                        }}
+                        placeholder="Component name"
+                        className="flex-1"
+                        maxLength={100}
+                      />
+                    )}
+
+                    {parts.length > 1 && (
+                      <Button type="button" variant="ghost" size="icon" onClick={() => removePart(i)} className="shrink-0">
+                        <Trash2 className="h-4 w-4 text-muted-foreground" />
+                      </Button>
+                    )}
+                  </div>
+
+                  {/* Price row */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1">
+                      <label className="text-xs text-muted-foreground">Your price (what you paid)</label>
+                      <Input
+                        type="number"
+                        value={part.price || ''}
+                        onChange={(e) => updatePartPrice(i, Number(e.target.value))}
+                        placeholder="₨ 0"
+                        min={0}
+                        className="mt-1"
+                      />
+                    </div>
+                    {currentPrice !== undefined && currentPrice > 0 && (
+                      <div className="text-right shrink-0">
+                        <p className="text-xs text-muted-foreground">Current lowest</p>
+                        <p className="text-sm font-semibold text-primary mt-1">₨{currentPrice.toLocaleString()}</p>
+                        {part.seller_name && (
+                          <p className="text-xs text-muted-foreground">{part.seller_name}</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
             {totalPrice > 0 && (
               <p className="text-sm text-right font-mono">
                 Total: <span className="text-primary font-bold">₨{totalPrice.toLocaleString()}</span>
