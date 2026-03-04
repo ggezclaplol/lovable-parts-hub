@@ -96,6 +96,7 @@ export function useCommunityBuilds(useCaseFilter?: string) {
         likes_count: b.likes_count || 0,
         comments_count: b.comments_count || 0,
         created_at: b.created_at,
+        image_url: b.image_url,
         profile: b.profiles,
         user_has_liked: likedBuildIds.includes(b.id),
       }));
