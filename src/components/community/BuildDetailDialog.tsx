@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { supabase } from '@/integrations/supabase/client';
 import { type CommunityBuild, type BuildPart, USE_CASES } from '@/hooks/useCommunityBuilds';
 import { formatDistanceToNow } from 'date-fns';
@@ -17,6 +18,7 @@ import {
   Box,
   Fan,
   Monitor,
+  ChevronDown,
 } from 'lucide-react';
 
 const categoryIcons: Record<string, React.ElementType> = {
@@ -200,82 +202,92 @@ export function BuildDetailDialog({ build, open, onOpenChange }: BuildDetailDial
               const Icon = categoryIcons[part.category] || Package;
 
               return (
-                <div
-                  key={i}
-                  className="rounded-xl border border-border bg-card/50 overflow-hidden"
-                >
-                  <div className="flex items-center gap-3 p-4">
-                    <div className="p-2 rounded-lg bg-primary/10 shrink-0">
-                      <Icon className="h-5 w-5 text-primary" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-                        {part.category}
-                      </p>
-                      <p className="font-semibold truncate">{part.name}</p>
-                      {detail?.brand && (
-                        <p className="text-xs text-muted-foreground">{detail.brand}</p>
-                      )}
-                    </div>
-                    <div className="text-right shrink-0">
-                      <p className="font-bold text-primary">₨{part.price.toLocaleString()}</p>
-                      {part.seller_name && (
-                        <p className="text-xs text-muted-foreground">{part.seller_name}</p>
-                      )}
-                    </div>
-                  </div>
+                <Collapsible key={i}>
+                  <div className="rounded-xl border border-border bg-card/50 overflow-hidden">
+                    <CollapsibleTrigger className="w-full">
+                      <div className="flex items-center gap-3 p-4 hover:bg-secondary/30 transition-colors">
+                        <div className="p-2 rounded-lg bg-primary/10 shrink-0">
+                          <Icon className="h-5 w-5 text-primary" />
+                        </div>
+                        <div className="flex-1 min-w-0 text-left">
+                          <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+                            {part.category}
+                          </p>
+                          <p className="font-semibold truncate">{part.name}</p>
+                          {detail?.brand && (
+                            <p className="text-xs text-muted-foreground">{detail.brand}</p>
+                          )}
+                        </div>
+                        <div className="text-right shrink-0 mr-2">
+                          <p className="font-bold text-primary">₨{part.price.toLocaleString()}</p>
+                          {part.seller_name && (
+                            <p className="text-xs text-muted-foreground">{part.seller_name}</p>
+                          )}
+                        </div>
+                        {detail && (
+                          <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 [&[data-state=open]]:rotate-180" />
+                        )}
+                      </div>
+                    </CollapsibleTrigger>
 
-                  {/* Product specs & seller details */}
-                  {detail && (
-                    <div className="border-t border-border px-4 py-3 bg-secondary/30 space-y-3">
-                      {/* Specs */}
-                      {detail.specs && Object.keys(detail.specs).length > 0 && (
-                        <div>
-                          <p className="text-xs font-medium text-muted-foreground mb-1.5">Specifications</p>
-                          <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-                            {Object.entries(detail.specs).map(([key, value]) => (
-                              <div key={key} className="flex justify-between text-xs">
-                                <span className="text-muted-foreground capitalize">
-                                  {key.replace(/_/g, ' ')}
-                                </span>
-                                <span className="font-medium text-foreground">{String(value)}</span>
+                    {detail && (
+                      <CollapsibleContent>
+                        <div className="border-t border-border px-4 py-3 bg-secondary/30 space-y-3">
+                          {detail.specs && Object.keys(detail.specs).length > 0 && (
+                            <div>
+                              <p className="text-xs font-medium text-muted-foreground mb-1.5">Specifications</p>
+                              <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                                {Object.entries(detail.specs).map(([key, value]) => (
+                                  <div key={key} className="flex justify-between text-xs">
+                                    <span className="text-muted-foreground capitalize">
+                                      {key.replace(/_/g, ' ')}
+                                    </span>
+                                    <span className="font-medium text-foreground">{String(value)}</span>
+                                  </div>
+                                ))}
                               </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                            </div>
+                          )}
 
-                      {/* Seller info */}
-                      {detail.listing && (
-                        <div>
-                          <p className="text-xs font-medium text-muted-foreground mb-1.5">Seller</p>
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium">{detail.listing.seller.name}</span>
-                              {detail.listing.seller.verified && (
-                                <BadgeCheck className="h-3.5 w-3.5 text-primary" />
-                              )}
-                              {detail.listing.seller.rating && (
-                                <span className="flex items-center gap-0.5 text-xs text-muted-foreground">
-                                  <Star className="h-3 w-3 fill-warning text-warning" />
-                                  {detail.listing.seller.rating.toFixed(1)}
-                                </span>
-                              )}
+                          {detail.listing && (
+                            <div>
+                              <p className="text-xs font-medium text-muted-foreground mb-1.5">Seller</p>
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm font-medium">{detail.listing.seller.name}</span>
+                                  {detail.listing.seller.verified && (
+                                    <BadgeCheck className="h-3.5 w-3.5 text-primary" />
+                                  )}
+                                  {detail.listing.seller.rating && (
+                                    <span className="flex items-center gap-0.5 text-xs text-muted-foreground">
+                                      <Star className="h-3 w-3 fill-warning text-warning" />
+                                      {detail.listing.seller.rating.toFixed(1)}
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                  <span className="capitalize">{detail.listing.condition}</span>
+                                  {detail.listing.shipping_cost && detail.listing.shipping_cost > 0 ? (
+                                    <span>+₨{detail.listing.shipping_cost} shipping</span>
+                                  ) : (
+                                    <span className="text-green-500">Free shipping</span>
+                                  )}
+                                </div>
+                              </div>
                             </div>
-                            <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                              <span className="capitalize">{detail.listing.condition}</span>
-                              {detail.listing.shipping_cost && detail.listing.shipping_cost > 0 ? (
-                                <span>+₨{detail.listing.shipping_cost} shipping</span>
-                              ) : (
-                                <span className="text-green-500">Free shipping</span>
-                              )}
+                          )}
+
+                          {detail.description && (
+                            <div>
+                              <p className="text-xs font-medium text-muted-foreground mb-1">Description</p>
+                              <p className="text-xs text-muted-foreground leading-relaxed">{detail.description}</p>
                             </div>
-                          </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  )}
-                </div>
+                      </CollapsibleContent>
+                    )}
+                  </div>
+                </Collapsible>
               );
             })}
           </div>
