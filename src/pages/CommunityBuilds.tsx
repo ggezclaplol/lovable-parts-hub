@@ -48,8 +48,32 @@ import {
   ImagePlus,
   X,
   Pencil,
+  ChevronDown,
+  CircuitBoard,
+  MemoryStick,
+  HardDrive,
+  Zap,
+  Box,
+  Fan,
+  Monitor,
+  Package,
+  BadgeCheck,
+  Star,
 } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { supabase } from '@/integrations/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
+
+const categoryIcons: Record<string, React.ElementType> = {
+  CPU: Cpu,
+  GPU: Monitor,
+  RAM: MemoryStick,
+  Motherboard: CircuitBoard,
+  Storage: HardDrive,
+  PSU: Zap,
+  Case: Box,
+  Cooling: Fan,
+};
 
 function BuildCard({ build, onEdit, onViewDetail }: { build: CommunityBuild; onEdit?: (build: CommunityBuild) => void; onViewDetail?: (build: CommunityBuild) => void }) {
   const { isAuthenticated, user } = useAuth();
