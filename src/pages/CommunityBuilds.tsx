@@ -52,7 +52,9 @@ import { formatDistanceToNow } from 'date-fns';
 function BuildCard({ build, onEdit }: { build: CommunityBuild; onEdit?: (build: CommunityBuild) => void }) {
   const { isAuthenticated, user } = useAuth();
   const toggleLike = useToggleLike();
+  const deleteBuild = useDeleteBuild();
   const [showComments, setShowComments] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const useCaseInfo = USE_CASES.find((u) => u.value === build.use_case) || USE_CASES[USE_CASES.length - 1];
   const isOwner = user?.id === build.user_id;
 
