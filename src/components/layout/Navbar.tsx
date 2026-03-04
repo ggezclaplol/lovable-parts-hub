@@ -53,6 +53,14 @@ export function Navbar() {
               <Wrench className="h-4 w-4" />
               PC Builder
             </Link>
+
+            <Link 
+              to="/ai-builder" 
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-all text-sm font-medium"
+            >
+              <Sparkles className="h-4 w-4" />
+              AI Builder
+            </Link>
             
             {isAdmin && (
               <Link 
