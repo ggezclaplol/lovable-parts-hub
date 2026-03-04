@@ -516,7 +516,13 @@ export default function CommunityBuilds() {
             <p className="text-muted-foreground mt-1">Browse and share PC builds with the community</p>
           </div>
           {isAuthenticated ? (
-            <CreateBuildDialog />
+            <>
+              <Button variant="glow" className="gap-2" onClick={() => { setEditingBuild(null); setDialogOpen(true); }}>
+                <Plus className="h-4 w-4" />
+                Share Your Build
+              </Button>
+              <BuildFormDialog open={dialogOpen} onOpenChange={handleDialogChange} editBuild={editingBuild} />
+            </>
           ) : (
             <Link to="/login">
               <Button variant="glow" className="gap-2">
