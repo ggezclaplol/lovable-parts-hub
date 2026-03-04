@@ -100,7 +100,7 @@ function BuildCard({ build }: { build: CommunityBuild }) {
       {build.total_price > 0 && (
         <div className="flex items-center justify-between pt-2 border-t border-border/50">
           <span className="text-sm text-muted-foreground">Total</span>
-          <span className="font-display font-bold gradient-text">${build.total_price.toLocaleString()}</span>
+          <span className="font-display font-bold gradient-text">₨{build.total_price.toLocaleString()}</span>
         </div>
       )}
 
