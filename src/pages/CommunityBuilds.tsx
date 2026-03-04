@@ -48,10 +48,12 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
-function BuildCard({ build }: { build: CommunityBuild }) {
-  const { isAuthenticated } = useAuth();
+function BuildCard({ build, onEdit }: { build: CommunityBuild; onEdit?: (build: CommunityBuild) => void }) {
+  const { isAuthenticated, user } = useAuth();
   const toggleLike = useToggleLike();
   const [showComments, setShowComments] = useState(false);
+  const useCaseInfo = USE_CASES.find((u) => u.value === build.use_case) || USE_CASES[USE_CASES.length - 1];
+  const isOwner = user?.id === build.user_id;
   const useCaseInfo = USE_CASES.find((u) => u.value === build.use_case) || USE_CASES[USE_CASES.length - 1];
 
   return (
