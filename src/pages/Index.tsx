@@ -92,6 +92,28 @@ export default function Index() {
             </div>
           </div>
 
+          {/* AI Builder CTA */}
+          <Link
+            to="/ai-builder"
+            className="md:col-span-6 lg:col-span-8 bento-card neon-border p-6 lg:p-8 flex flex-col sm:flex-row items-center gap-6 group animate-fade-in relative overflow-hidden"
+            style={{ animationDelay: '120ms' }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/[0.06] via-transparent to-primary/[0.03]" />
+            <div className="relative p-4 rounded-2xl bg-primary/10 neon-border group-hover:bg-primary/15 transition-all shrink-0">
+              <Sparkles className="h-8 w-8 text-primary" />
+            </div>
+            <div className="relative text-center sm:text-left flex-1">
+              <h3 className="text-xl font-display font-bold mb-1">AI PC Builder</h3>
+              <p className="text-sm text-muted-foreground">Tell our AI what you need and get a complete build recommendation tailored to your budget and use case.</p>
+            </div>
+            <div className="relative">
+              <Button variant="glow" size="lg" className="rounded-xl gap-2">
+                Try it now
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </Link>
+
           {/* Quick feature cards */}
           <div className="md:col-span-3 lg:col-span-4 bento-card p-6 flex flex-col justify-between animate-fade-in" style={{ animationDelay: '150ms' }}>
             <div className="flex items-center gap-3 mb-4">
