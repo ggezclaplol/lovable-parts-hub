@@ -193,23 +193,26 @@ export default function Index() {
           }
 
           {/* Features row */}
-          {[
-          { icon: Zap, title: 'Lightning Fast', desc: 'Compare specs & prices instantly' },
-          { icon: Shield, title: 'Compatibility', desc: 'Auto-verify all selected parts' },
-          { icon: Truck, title: 'Best Prices', desc: 'Deals from trusted retailers' }].
-          map((feature, i) =>
-          <div
-            key={feature.title}
-            className="md:col-span-2 lg:col-span-4 bento-card p-6 animate-fade-in"
-            style={{ animationDelay: `${(i + 10) * 60}ms` }}>
-            
-              <div className="w-10 h-10 mb-4 rounded-xl bg-primary/10 flex items-center justify-center">
-                <feature.icon className="h-5 w-5 text-primary" />
+          {/* Features row - separated cards */}
+          <div className="md:col-span-6 lg:col-span-12 grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-5">
+            {[
+              { icon: Zap, title: 'Lightning Fast', desc: 'Compare specs & prices instantly' },
+              { icon: Shield, title: 'Compatibility', desc: 'Auto-verify all selected parts' },
+              { icon: Truck, title: 'Best Prices', desc: 'Deals from trusted retailers' },
+            ].map((feature, i) => (
+              <div
+                key={feature.title}
+                className="bento-card p-6 animate-fade-in"
+                style={{ animationDelay: `${(i + 10) * 60}ms` }}
+              >
+                <div className="w-10 h-10 mb-4 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <feature.icon className="h-5 w-5 text-primary" />
+                </div>
+                <h3 className="font-display font-semibold mb-1">{feature.title}</h3>
+                <p className="text-sm text-muted-foreground">{feature.desc}</p>
               </div>
-              <h3 className="font-display font-semibold mb-1">{feature.title}</h3>
-              <p className="text-sm text-muted-foreground">{feature.desc}</p>
-            </div>
-          )}
+            ))}
+          </div>
 
           {/* CTA Banner */}
           <div className="md:col-span-6 lg:col-span-12 bento-card neon-border p-8 lg:p-12 flex flex-col lg:flex-row items-center justify-between gap-6 relative overflow-hidden animate-fade-in" style={{ animationDelay: '800ms' }}>
