@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { BuildDetailDialog } from '@/components/community/BuildDetailDialog';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -49,7 +50,7 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
-function BuildCard({ build, onEdit }: { build: CommunityBuild; onEdit?: (build: CommunityBuild) => void }) {
+function BuildCard({ build, onEdit, onViewDetail }: { build: CommunityBuild; onEdit?: (build: CommunityBuild) => void; onViewDetail?: (build: CommunityBuild) => void }) {
   const { isAuthenticated, user } = useAuth();
   const toggleLike = useToggleLike();
   const deleteBuild = useDeleteBuild();
@@ -60,7 +61,7 @@ function BuildCard({ build, onEdit }: { build: CommunityBuild; onEdit?: (build: 
   const isOwner = user?.id === build.user_id;
 
   return (
-    <div className="bento-card overflow-hidden flex flex-col animate-fade-in">
+    <div className="bento-card overflow-hidden flex flex-col animate-fade-in cursor-pointer hover:border-primary/30 transition-colors" onClick={() => onViewDetail?.(build)}>
       {/* Build Image */}
       {build.image_url && (
         <div className="w-full h-48 overflow-hidden">
@@ -131,7 +132,7 @@ function BuildCard({ build, onEdit }: { build: CommunityBuild; onEdit?: (build: 
       )}
 
       {/* Actions */}
-      <div className="flex items-center gap-3 pt-1">
+      <div className="flex items-center gap-3 pt-1" onClick={(e) => e.stopPropagation()}>
         <button
           onClick={() => {
             if (!isAuthenticated) return;
@@ -527,6 +528,7 @@ export default function CommunityBuilds() {
   const { isAuthenticated } = useAuth();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingBuild, setEditingBuild] = useState<CommunityBuild | null>(null);
+  const [detailBuild, setDetailBuild] = useState<CommunityBuild | null>(null);
 
   const handleEdit = (build: CommunityBuild) => {
     setEditingBuild(build);
@@ -627,10 +629,12 @@ export default function CommunityBuilds() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {builds?.map((build) => (
-              <BuildCard key={build.id} build={build} onEdit={handleEdit} />
+              <BuildCard key={build.id} build={build} onEdit={handleEdit} onViewDetail={(b) => setDetailBuild(b)} />
             ))}
           </div>
         )}
+
+        <BuildDetailDialog build={detailBuild} open={!!detailBuild} onOpenChange={(open) => { if (!open) setDetailBuild(null); }} />
       </div>
     </Layout>
   );
