@@ -41,6 +41,8 @@ import {
   Loader2,
   Sparkles,
   Filter,
+  ImagePlus,
+  X,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
