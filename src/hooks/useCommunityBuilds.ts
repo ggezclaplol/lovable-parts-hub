@@ -23,6 +23,9 @@ export interface BuildPart {
   name: string;
   category: string;
   price: number;
+  product_id?: string;
+  listing_id?: string;
+  seller_name?: string;
 }
 
 export interface BuildComment {
