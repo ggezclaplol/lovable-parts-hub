@@ -44,6 +44,7 @@ import {
   Filter,
   ImagePlus,
   X,
+  Pencil,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
