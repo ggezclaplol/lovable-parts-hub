@@ -14,7 +14,8 @@ import {
   CircuitBoard,
   Box,
   Fan,
-  Package
+  Package,
+  Sparkles
 } from 'lucide-react';
 
 const categoryIcons: Record<string, React.ElementType> = {
@@ -50,7 +51,6 @@ export default function Index() {
   const { data: categories, isLoading: categoriesLoading } = useCategories();
   const { data: products } = useProducts();
 
-  // Count products per category
   const categoryCounts = categories?.map((cat) => ({
     ...cat,
     count: products?.filter((p) => p.category?.id === cat.id).length || 0,
@@ -58,72 +58,110 @@ export default function Index() {
 
   return (
     <Layout>
-      {/* Hero Section */}
+      {/* Hero Section — Editorial Style */}
       <section className="relative overflow-hidden">
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 glow-bg" />
-        
-        <div className="container mx-auto px-4 py-20 lg:py-32 relative">
-          <div className="max-w-3xl mx-auto text-center animate-fade-in">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm mb-6">
-              <Zap className="h-4 w-4" />
-              Build your dream PC today
+        <div className="container mx-auto px-4 py-20 lg:py-28">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left: Content */}
+            <div className="animate-fade-in">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-8">
+                <Sparkles className="h-4 w-4" />
+                Curated PC components
+              </div>
+              
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold mb-6 leading-[1.1] text-foreground">
+                Build Your
+                <span className="block gradient-text italic">Perfect Rig</span>
+              </h1>
+              
+              <p className="text-lg text-muted-foreground mb-10 max-w-lg leading-relaxed">
+                A curated marketplace for PC enthusiasts. Compare prices, check compatibility, 
+                and assemble your dream machine — all in one place.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button variant="glow" size="xl" className="rounded-full" asChild>
+                  <Link to="/products">
+                    Browse Parts
+                    <ArrowRight className="h-5 w-5" />
+                  </Link>
+                </Button>
+                <Button variant="outline" size="xl" className="rounded-full" asChild>
+                  <Link to="/build">
+                    PC Builder
+                  </Link>
+                </Button>
+              </div>
             </div>
-            
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-              Build Your Perfect
-              <span className="block gradient-text">Gaming Rig</span>
-            </h1>
-            
-            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Pick the best PC components, compare prices from multiple sellers, and create the ultimate build 
-              with our comprehensive part picker tool.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="glow" size="xl" asChild>
-                <Link to="/products">
-                  Browse Parts
-                  <ArrowRight className="h-5 w-5" />
-                </Link>
-              </Button>
+
+            {/* Right: Editorial Card Stack */}
+            <div className="hidden lg:block relative animate-fade-in" style={{ animationDelay: '200ms' }}>
+              <div className="relative">
+                {/* Main card */}
+                <div className="editorial-card p-8 relative z-10">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
+                      <Monitor className="h-7 w-7 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-serif font-semibold text-lg">Graphics Cards</p>
+                      <p className="text-sm text-muted-foreground">From ₨45,000</p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    {['RTX 4090', 'RTX 4070 Ti', 'RX 7900 XTX'].map((gpu, i) => (
+                      <div key={gpu} className="flex items-center justify-between py-2.5 px-4 rounded-xl bg-secondary/50">
+                        <span className="text-sm font-medium">{gpu}</span>
+                        <span className="text-xs text-muted-foreground">Compare →</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* Stacked behind */}
+                <div className="absolute top-4 -right-4 w-full h-full rounded-2xl bg-secondary/60 -z-10 rotate-2" />
+                <div className="absolute top-8 -right-8 w-full h-full rounded-2xl bg-secondary/30 -z-20 rotate-[4deg]" />
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Categories Section */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Browse Components</h2>
-          <p className="text-muted-foreground">
-            Explore our extensive catalog of PC parts
-          </p>
+      {/* Categories — Asymmetric Editorial Grid */}
+      <section className="container mx-auto px-4 py-20">
+        <div className="flex items-end justify-between mb-12">
+          <div>
+            <p className="text-sm font-medium text-primary uppercase tracking-widest mb-2">Categories</p>
+            <h2 className="text-4xl font-serif font-bold">Browse Components</h2>
+          </div>
+          <Link to="/products" className="text-sm font-medium text-primary hover:underline underline-offset-4 hidden sm:block">
+            View all →
+          </Link>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-5">
           {categoriesLoading ? (
             Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="glass-effect rounded-xl p-6 animate-pulse">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-secondary" />
-                <div className="h-4 bg-secondary rounded w-3/4 mx-auto mb-2" />
-                <div className="h-3 bg-secondary rounded w-1/2 mx-auto" />
+              <div key={i} className="editorial-card p-6 animate-pulse">
+                <div className="w-12 h-12 mb-4 rounded-xl bg-secondary" />
+                <div className="h-4 bg-secondary rounded w-3/4 mb-2" />
+                <div className="h-3 bg-secondary rounded w-1/2" />
               </div>
             ))
           ) : (
             categoryCounts?.map((category, index) => {
               const IconComponent = categoryIcons[category.name] || Package;
+              const isLarge = index === 0 || index === 3;
               return (
                 <Link
                   key={category.id}
                   to="/products"
-                  className="glass-effect rounded-xl p-6 text-center hover:border-primary/30 transition-all duration-300 group animate-fade-in"
-                  style={{ animationDelay: `${index * 50}ms` }}
+                  className={`editorial-card p-6 group animate-fade-in ${isLarge ? 'md:col-span-2 md:row-span-1' : ''}`}
+                  style={{ animationDelay: `${index * 60}ms` }}
                 >
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    <IconComponent className="h-8 w-8 text-primary" />
+                  <div className="w-12 h-12 mb-4 rounded-xl bg-primary/8 flex items-center justify-center group-hover:bg-primary/15 transition-colors">
+                    <IconComponent className="h-6 w-6 text-primary" />
                   </div>
-                  <h3 className="font-semibold mb-1">{category.name}</h3>
+                  <h3 className="font-serif font-semibold text-lg mb-1">{category.name}</h3>
                   <p className="text-sm text-muted-foreground">{category.count} products</p>
                 </Link>
               );
@@ -132,37 +170,39 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Features — Horizontal Editorial Strip */}
       <section className="container mx-auto px-4 py-16">
-        <div className="glass-effect rounded-2xl p-8 lg:p-12">
-          <div className="grid md:grid-cols-3 gap-8">
+        <div className="editorial-card p-0 overflow-hidden">
+          <div className="grid md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-border">
             {features.map((feature, index) => (
               <div 
                 key={feature.title} 
-                className="text-center animate-fade-in"
+                className="p-8 lg:p-10 animate-fade-in"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <feature.icon className="h-7 w-7 text-primary" />
+                <div className="w-12 h-12 mb-5 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <feature.icon className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-                <p className="text-muted-foreground text-sm">{feature.description}</p>
+                <h3 className="font-serif text-xl font-semibold mb-2">{feature.title}</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* CTA Section — Magazine Banner */}
       <section className="container mx-auto px-4 py-16">
-        <div className="relative rounded-2xl overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-blue-500/20" />
-          <div className="relative glass-effect rounded-2xl p-8 lg:p-12 text-center">
-            <h2 className="text-3xl font-bold mb-4">Ready to Build?</h2>
-            <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-              Compare prices from multiple sellers and find the best deals on PC components.
-            </p>
-            <Button variant="glow" size="lg" asChild>
+        <div className="editorial-card overflow-hidden relative">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-warning/5" />
+          <div className="relative p-10 lg:p-16 flex flex-col lg:flex-row items-center justify-between gap-8">
+            <div className="text-center lg:text-left">
+              <h2 className="text-4xl font-serif font-bold mb-3">Ready to Build?</h2>
+              <p className="text-muted-foreground max-w-md leading-relaxed">
+                Compare prices from multiple sellers and find the best deals on PC components.
+              </p>
+            </div>
+            <Button variant="glow" size="xl" className="rounded-full shrink-0" asChild>
               <Link to="/products">
                 Start Building
                 <ArrowRight className="h-5 w-5" />
@@ -173,12 +213,14 @@ export default function Index() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border mt-16">
-        <div className="container mx-auto px-4 py-8">
+      <footer className="border-t border-border/40 mt-16">
+        <div className="container mx-auto px-4 py-10">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <Cpu className="h-6 w-6 text-primary" />
-              <span className="font-bold gradient-text">PCForge</span>
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-xl bg-primary/10">
+                <Cpu className="h-5 w-5 text-primary" />
+              </div>
+              <span className="font-serif font-bold text-lg">PCForge</span>
             </div>
             <p className="text-sm text-muted-foreground">
               © 2024 PCForge. Final Year Project.
