@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Cpu, Menu, X, Package, LogIn, LogOut, ShieldCheck, User, Wrench, Sun, Moon } from 'lucide-react';
+import { Cpu, Menu, X, Package, LogIn, LogOut, ShieldCheck, User, Wrench, Sun, Moon, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { CartSheet } from '@/components/cart/CartSheet';
@@ -52,6 +52,14 @@ export function Navbar() {
             >
               <Wrench className="h-4 w-4" />
               PC Builder
+            </Link>
+
+            <Link 
+              to="/ai-builder" 
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-all text-sm font-medium"
+            >
+              <Sparkles className="h-4 w-4" />
+              AI Builder
             </Link>
             
             {isAdmin && (
@@ -137,6 +145,10 @@ export function Navbar() {
               <Link to="/build" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary/60 transition-colors" onClick={() => setMobileMenuOpen(false)}>
                 <Wrench className="h-5 w-5 text-primary" />
                 <span className="font-medium">PC Builder</span>
+              </Link>
+              <Link to="/ai-builder" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary/60 transition-colors" onClick={() => setMobileMenuOpen(false)}>
+                <Sparkles className="h-5 w-5 text-primary" />
+                <span className="font-medium">AI Builder</span>
               </Link>
               {isAdmin && (
                 <Link to="/admin" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary/60 transition-colors" onClick={() => setMobileMenuOpen(false)}>
