@@ -327,7 +327,34 @@ function CreateBuildDialog() {
             />
           </div>
 
-          <div className="space-y-3">
+          {/* Image Upload */}
+          <div className="space-y-2">
+            <Label>Build Photo (optional)</Label>
+            {imagePreview ? (
+              <div className="relative rounded-lg overflow-hidden border border-border">
+                <img src={imagePreview} alt="Preview" className="w-full h-40 object-cover" />
+                <button
+                  type="button"
+                  onClick={removeImage}
+                  className="absolute top-2 right-2 p-1 rounded-full bg-background/80 hover:bg-background transition-colors"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <label className="flex flex-col items-center justify-center h-32 rounded-lg border-2 border-dashed border-border hover:border-primary/50 cursor-pointer transition-colors bg-secondary/30">
+                <ImagePlus className="h-6 w-6 text-muted-foreground mb-1" />
+                <span className="text-sm text-muted-foreground">Click to upload (max 5MB)</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+              </label>
+            )}
+          </div>
+
             <div className="flex items-center justify-between">
               <Label>Parts List</Label>
               <Button type="button" variant="outline" size="sm" onClick={addPart} className="gap-1">
