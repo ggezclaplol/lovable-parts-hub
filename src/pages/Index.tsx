@@ -129,6 +129,28 @@ export default function Index() {
             </div>
           </Link>
 
+          {/* Community Builds CTA */}
+          <Link
+            to="/community"
+            className="md:col-span-6 lg:col-span-12 bento-card p-6 lg:p-8 flex flex-col sm:flex-row items-center gap-6 group animate-fade-in relative overflow-hidden"
+            style={{ animationDelay: '220ms' }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-accent/[0.04] via-transparent to-accent/[0.02]" />
+            <div className="relative p-4 rounded-2xl bg-accent/10 border border-accent/20 group-hover:bg-accent/15 transition-all shrink-0">
+              <Users className="h-8 w-8 text-accent" />
+            </div>
+            <div className="relative text-center sm:text-left flex-1">
+              <h3 className="text-xl font-display font-bold mb-1">Community Builds</h3>
+              <p className="text-sm text-muted-foreground">Browse builds shared by the community, get inspired, and share your own setup.</p>
+            </div>
+            <div className="relative">
+              <Button variant="outline" size="lg" className="rounded-xl gap-2">
+                Explore Builds
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </Link>
+
           {/* Categories heading */}
           <div className="md:col-span-6 lg:col-span-12 flex items-end justify-between pt-6">
             <div>
