@@ -355,6 +355,7 @@ function CreateBuildDialog() {
             )}
           </div>
 
+          <div className="space-y-3">
             <div className="flex items-center justify-between">
               <Label>Parts List</Label>
               <Button type="button" variant="outline" size="sm" onClick={addPart} className="gap-1">
