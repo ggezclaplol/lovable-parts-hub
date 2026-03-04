@@ -142,6 +142,15 @@ function BuildCard({ build, onEdit }: { build: CommunityBuild; onEdit?: (build: 
           <MessageCircle className="h-4 w-4" />
           {build.comments_count}
         </button>
+        {isOwner && onEdit && (
+          <button
+            onClick={() => onEdit(build)}
+            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer ml-auto"
+          >
+            <Pencil className="h-4 w-4" />
+            Edit
+          </button>
+        )}
       </div>
 
       {/* Comments Section */}
