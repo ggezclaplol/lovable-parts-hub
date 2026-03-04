@@ -14,6 +14,7 @@ export interface CommunityBuild {
   likes_count: number;
   comments_count: number;
   created_at: string;
+  image_url: string | null;
   profile: { username: string; avatar_url: string | null } | null;
   user_has_liked: boolean;
 }
