@@ -86,7 +86,7 @@ function BuildCard({ build }: { build: CommunityBuild }) {
                 {part.name}
               </span>
               <span className="font-mono text-xs text-primary shrink-0 ml-2">
-                ${part.price.toLocaleString()}
+                ₨{part.price.toLocaleString()}
               </span>
             </div>
           ))}
@@ -100,7 +100,7 @@ function BuildCard({ build }: { build: CommunityBuild }) {
       {build.total_price > 0 && (
         <div className="flex items-center justify-between pt-2 border-t border-border/50">
           <span className="text-sm text-muted-foreground">Total</span>
-          <span className="font-display font-bold gradient-text">${build.total_price.toLocaleString()}</span>
+          <span className="font-display font-bold gradient-text">₨{build.total_price.toLocaleString()}</span>
         </div>
       )}
 
@@ -337,7 +337,7 @@ function CreateBuildDialog() {
             ))}
             {totalPrice > 0 && (
               <p className="text-sm text-right font-mono">
-                Total: <span className="text-primary font-bold">${totalPrice.toLocaleString()}</span>
+                Total: <span className="text-primary font-bold">₨{totalPrice.toLocaleString()}</span>
               </p>
             )}
           </div>
