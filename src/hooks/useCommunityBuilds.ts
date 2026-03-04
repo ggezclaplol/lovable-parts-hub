@@ -112,7 +112,7 @@ export function useBuildComments(buildId: string) {
           user_id,
           content,
           created_at,
-          profiles (username, avatar_url)
+          profiles!build_comments_user_id_profiles_fkey (username, avatar_url)
         `)
         .eq('build_id', buildId)
         .order('created_at', { ascending: true });
