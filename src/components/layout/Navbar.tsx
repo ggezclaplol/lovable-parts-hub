@@ -15,6 +15,7 @@ import {
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
 
