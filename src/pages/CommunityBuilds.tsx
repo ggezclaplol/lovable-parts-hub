@@ -23,6 +23,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import {
   useCommunityBuilds,
   useCreateBuild,
+  useUpdateBuild,
   useToggleLike,
   useBuildComments,
   useAddComment,
