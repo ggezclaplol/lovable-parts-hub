@@ -92,11 +92,25 @@ export default function Index() {
             </div>
           </div>
 
+          {/* Quick feature cards */}
+          <div className="md:col-span-3 lg:col-span-4 bento-card p-6 flex flex-col justify-between animate-fade-in" style={{ animationDelay: '150ms' }}>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2.5 rounded-xl bg-success/10 border border-success/20">
+                <Shield className="h-5 w-5 text-success" />
+              </div>
+              <span className="text-sm font-mono text-muted-foreground uppercase tracking-wider">Compatibility</span>
+            </div>
+            <div>
+              <p className="text-lg font-display font-semibold">Auto-Check</p>
+              <p className="text-sm text-muted-foreground mt-1">Verify parts work together</p>
+            </div>
+          </div>
+
           {/* AI Builder CTA */}
           <Link
             to="/ai-builder"
-            className="md:col-span-6 lg:col-span-8 bento-card neon-border p-6 lg:p-8 flex flex-col sm:flex-row items-center gap-6 group animate-fade-in relative overflow-hidden"
-            style={{ animationDelay: '120ms' }}
+            className="md:col-span-6 lg:col-span-12 bento-card neon-border p-6 lg:p-8 flex flex-col sm:flex-row items-center gap-6 group animate-fade-in relative overflow-hidden"
+            style={{ animationDelay: '180ms' }}
           >
             <div className="absolute inset-0 bg-gradient-to-r from-primary/[0.06] via-transparent to-primary/[0.03]" />
             <div className="relative p-4 rounded-2xl bg-primary/10 neon-border group-hover:bg-primary/15 transition-all shrink-0">
@@ -113,20 +127,6 @@ export default function Index() {
               </Button>
             </div>
           </Link>
-
-          {/* Quick feature cards */}
-          <div className="md:col-span-3 lg:col-span-4 bento-card p-6 flex flex-col justify-between animate-fade-in" style={{ animationDelay: '150ms' }}>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2.5 rounded-xl bg-success/10 border border-success/20">
-                <Shield className="h-5 w-5 text-success" />
-              </div>
-              <span className="text-sm font-mono text-muted-foreground uppercase tracking-wider">Compatibility</span>
-            </div>
-            <div>
-              <p className="text-lg font-display font-semibold">Auto-Check</p>
-              <p className="text-sm text-muted-foreground mt-1">Verify parts work together</p>
-            </div>
-          </div>
 
           {/* Categories heading */}
           <div className="md:col-span-6 lg:col-span-12 flex items-end justify-between pt-6">
