@@ -527,6 +527,7 @@ export default function CommunityBuilds() {
   const { isAuthenticated } = useAuth();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingBuild, setEditingBuild] = useState<CommunityBuild | null>(null);
+  const [detailBuild, setDetailBuild] = useState<CommunityBuild | null>(null);
 
   const handleEdit = (build: CommunityBuild) => {
     setEditingBuild(build);
