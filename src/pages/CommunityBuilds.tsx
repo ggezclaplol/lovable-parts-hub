@@ -487,6 +487,18 @@ export default function CommunityBuilds() {
   const [useCaseFilter, setUseCaseFilter] = useState('all');
   const { data: builds, isLoading } = useCommunityBuilds(useCaseFilter);
   const { isAuthenticated } = useAuth();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingBuild, setEditingBuild] = useState<CommunityBuild | null>(null);
+
+  const handleEdit = (build: CommunityBuild) => {
+    setEditingBuild(build);
+    setDialogOpen(true);
+  };
+
+  const handleDialogChange = (open: boolean) => {
+    setDialogOpen(open);
+    if (!open) setEditingBuild(null);
+  };
 
   return (
     <Layout>
