@@ -66,6 +66,14 @@ export function Navbar() {
 
             <div className="w-px h-6 bg-border/50 mx-2" />
 
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-all"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
+
             <CartSheet />
 
             {isAuthenticated ? (
