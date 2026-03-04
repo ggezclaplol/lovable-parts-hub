@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Cpu, Menu, X, Package, LogIn, LogOut, ShieldCheck, User, Wrench, Sun, Moon, Sparkles } from 'lucide-react';
+import { Cpu, Menu, X, Package, LogIn, LogOut, ShieldCheck, User, Wrench, Sun, Moon, Sparkles, Users } from 'lucide-react';
 import { useState } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { CartSheet } from '@/components/cart/CartSheet';
@@ -19,8 +19,8 @@ export function Navbar() {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate('/');
   };
 
@@ -60,6 +60,14 @@ export function Navbar() {
             >
               <Sparkles className="h-4 w-4" />
               AI Builder
+            </Link>
+
+            <Link 
+              to="/community" 
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-all text-sm font-medium"
+            >
+              <Users className="h-4 w-4" />
+              Community
             </Link>
             
             {isAdmin && (
@@ -149,6 +157,10 @@ export function Navbar() {
               <Link to="/ai-builder" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary/60 transition-colors" onClick={() => setMobileMenuOpen(false)}>
                 <Sparkles className="h-5 w-5 text-primary" />
                 <span className="font-medium">AI Builder</span>
+              </Link>
+              <Link to="/community" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary/60 transition-colors" onClick={() => setMobileMenuOpen(false)}>
+                <Users className="h-5 w-5 text-primary" />
+                <span className="font-medium">Community</span>
               </Link>
               {isAdmin && (
                 <Link to="/admin" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary/60 transition-colors" onClick={() => setMobileMenuOpen(false)}>

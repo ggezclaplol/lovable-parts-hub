@@ -14,6 +14,70 @@ export type Database = {
   }
   public: {
     Tables: {
+      build_comments: {
+        Row: {
+          build_id: string
+          content: string
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          build_id: string
+          content: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          build_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "build_comments_build_id_fkey"
+            columns: ["build_id"]
+            isOneToOne: false
+            referencedRelation: "community_builds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      build_likes: {
+        Row: {
+          build_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          build_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          build_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "build_likes_build_id_fkey"
+            columns: ["build_id"]
+            isOneToOne: false
+            referencedRelation: "community_builds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cart_items: {
         Row: {
           created_at: string
@@ -73,6 +137,48 @@ export type Database = {
           id?: string
           name?: string
           slug?: string
+        }
+        Relationships: []
+      }
+      community_builds: {
+        Row: {
+          comments_count: number | null
+          created_at: string
+          description: string
+          id: string
+          likes_count: number | null
+          parts: Json
+          title: string
+          total_price: number | null
+          updated_at: string
+          use_case: string
+          user_id: string
+        }
+        Insert: {
+          comments_count?: number | null
+          created_at?: string
+          description: string
+          id?: string
+          likes_count?: number | null
+          parts?: Json
+          title: string
+          total_price?: number | null
+          updated_at?: string
+          use_case?: string
+          user_id: string
+        }
+        Update: {
+          comments_count?: number | null
+          created_at?: string
+          description?: string
+          id?: string
+          likes_count?: number | null
+          parts?: Json
+          title?: string
+          total_price?: number | null
+          updated_at?: string
+          use_case?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -281,6 +387,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          id: string
+          updated_at: string
+          username: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          id: string
+          updated_at?: string
+          username: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+          username?: string
+        }
+        Relationships: []
       }
       sellers: {
         Row: {
