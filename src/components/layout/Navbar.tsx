@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Cpu, Menu, X, Package, LogIn, LogOut, ShieldCheck, User, Wrench } from 'lucide-react';
+import { Cpu, Menu, X, Package, LogIn, LogOut, ShieldCheck, User, Wrench, Sun, Moon } from 'lucide-react';
 import { useState } from 'react';
+import { useTheme } from '@/contexts/ThemeContext';
 import { CartSheet } from '@/components/cart/CartSheet';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -14,6 +15,7 @@ import {
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -63,6 +65,14 @@ export function Navbar() {
             )}
 
             <div className="w-px h-6 bg-border/50 mx-2" />
+
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-all"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
 
             <CartSheet />
 
