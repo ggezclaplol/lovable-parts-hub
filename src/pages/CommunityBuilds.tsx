@@ -245,6 +245,16 @@ function BuildFormDialog({
   const createBuild = useCreateBuild();
   const updateBuild = useUpdateBuild();
 
+  const resetForm = () => {
+    setTitle('');
+    setDescription('');
+    setUseCase('gaming');
+    setParts([{ name: '', category: 'CPU', price: 0 }]);
+    setImage(null);
+    setImagePreview(null);
+    setRemoveExistingImage(false);
+  };
+
   // Populate form when editing
   useEffect(() => {
     if (editBuild && open) {
