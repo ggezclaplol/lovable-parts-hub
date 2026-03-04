@@ -41,6 +41,8 @@ import {
   Loader2,
   Sparkles,
   Filter,
+  ImagePlus,
+  X,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -51,7 +53,19 @@ function BuildCard({ build }: { build: CommunityBuild }) {
   const useCaseInfo = USE_CASES.find((u) => u.value === build.use_case) || USE_CASES[USE_CASES.length - 1];
 
   return (
-    <div className="bento-card p-6 flex flex-col gap-4 animate-fade-in">
+    <div className="bento-card overflow-hidden flex flex-col animate-fade-in">
+      {/* Build Image */}
+      {build.image_url && (
+        <div className="w-full h-48 overflow-hidden">
+          <img
+            src={build.image_url}
+            alt={build.title}
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+        </div>
+      )}
+      <div className="p-6 flex flex-col gap-4">
       {/* Header */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
@@ -129,6 +143,7 @@ function BuildCard({ build }: { build: CommunityBuild }) {
 
       {/* Comments Section */}
       {showComments && <CommentsSection buildId={build.id} />}
+      </div>
     </div>
   );
 }
@@ -204,6 +219,8 @@ function CreateBuildDialog() {
   const [description, setDescription] = useState('');
   const [useCase, setUseCase] = useState('gaming');
   const [parts, setParts] = useState<BuildPart[]>([{ name: '', category: 'CPU', price: 0 }]);
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const createBuild = useCreateBuild();
 
   const addPart = () => setParts([...parts, { name: '', category: 'GPU', price: 0 }]);
@@ -212,6 +229,23 @@ function CreateBuildDialog() {
     const updated = [...parts];
     (updated[index] as any)[field] = value;
     setParts(updated);
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        return; // Max 5MB
+      }
+      setImage(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const removeImage = () => {
+    setImage(null);
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
+    setImagePreview(null);
   };
 
   const totalPrice = parts.reduce((sum, p) => sum + (Number(p.price) || 0), 0);
@@ -226,6 +260,7 @@ function CreateBuildDialog() {
         use_case: useCase,
         parts: validParts,
         total_price: totalPrice,
+        image: image || undefined,
       },
       {
         onSuccess: () => {
@@ -233,6 +268,7 @@ function CreateBuildDialog() {
           setTitle('');
           setDescription('');
           setParts([{ name: '', category: 'CPU', price: 0 }]);
+          removeImage();
         },
       }
     );
@@ -289,6 +325,34 @@ function CreateBuildDialog() {
               maxLength={2000}
               rows={3}
             />
+          </div>
+
+          {/* Image Upload */}
+          <div className="space-y-2">
+            <Label>Build Photo (optional)</Label>
+            {imagePreview ? (
+              <div className="relative rounded-lg overflow-hidden border border-border">
+                <img src={imagePreview} alt="Preview" className="w-full h-40 object-cover" />
+                <button
+                  type="button"
+                  onClick={removeImage}
+                  className="absolute top-2 right-2 p-1 rounded-full bg-background/80 hover:bg-background transition-colors"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <label className="flex flex-col items-center justify-center h-32 rounded-lg border-2 border-dashed border-border hover:border-primary/50 cursor-pointer transition-colors bg-secondary/30">
+                <ImagePlus className="h-6 w-6 text-muted-foreground mb-1" />
+                <span className="text-sm text-muted-foreground">Click to upload (max 5MB)</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+              </label>
+            )}
           </div>
 
           <div className="space-y-3">

@@ -14,6 +14,7 @@ export interface CommunityBuild {
   likes_count: number;
   comments_count: number;
   created_at: string;
+  image_url: string | null;
   profile: { username: string; avatar_url: string | null } | null;
   user_has_liked: boolean;
 }
@@ -62,6 +63,7 @@ export function useCommunityBuilds(useCaseFilter?: string) {
           likes_count,
           comments_count,
           created_at,
+          image_url,
           profiles!community_builds_user_id_profiles_fkey (username, avatar_url)
         `)
         .order('created_at', { ascending: false });
@@ -94,6 +96,7 @@ export function useCommunityBuilds(useCaseFilter?: string) {
         likes_count: b.likes_count || 0,
         comments_count: b.comments_count || 0,
         created_at: b.created_at,
+        image_url: b.image_url,
         profile: b.profiles,
         user_has_liked: likedBuildIds.includes(b.id),
       }));
@@ -141,9 +144,25 @@ export function useCreateBuild() {
       use_case: string;
       parts: BuildPart[];
       total_price: number;
+      image?: File;
     }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
+
+      let image_url: string | null = null;
+
+      if (build.image) {
+        const fileExt = build.image.name.split('.').pop();
+        const filePath = `${user.id}/${crypto.randomUUID()}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from('build-images')
+          .upload(filePath, build.image);
+        if (uploadError) throw uploadError;
+        const { data: urlData } = supabase.storage
+          .from('build-images')
+          .getPublicUrl(filePath);
+        image_url = urlData.publicUrl;
+      }
 
       const { data, error } = await supabase
         .from('community_builds')
@@ -154,6 +173,7 @@ export function useCreateBuild() {
           use_case: build.use_case,
           parts: build.parts as any,
           total_price: build.total_price,
+          image_url,
         })
         .select()
         .single();
