@@ -146,13 +146,39 @@ function BuildCard({ build, onEdit }: { build: CommunityBuild; onEdit?: (build: 
           {build.comments_count}
         </button>
         {isOwner && onEdit && (
-          <button
-            onClick={() => onEdit(build)}
-            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer ml-auto"
-          >
-            <Pencil className="h-4 w-4" />
-            Edit
-          </button>
+          <div className="flex items-center gap-2 ml-auto">
+            <button
+              onClick={() => onEdit(build)}
+              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+            >
+              <Pencil className="h-4 w-4" />
+              Edit
+            </button>
+            {confirmDelete ? (
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => deleteBuild.mutate(build.id)}
+                  className="text-xs px-2 py-1 rounded bg-destructive/15 text-destructive hover:bg-destructive/25 transition-colors"
+                  disabled={deleteBuild.isPending}
+                >
+                  {deleteBuild.isPending ? 'Deleting...' : 'Confirm'}
+                </button>
+                <button
+                  onClick={() => setConfirmDelete(false)}
+                  className="text-xs px-2 py-1 rounded text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setConfirmDelete(true)}
+                className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            )}
+          </div>
         )}
       </div>
 
