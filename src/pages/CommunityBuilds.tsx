@@ -100,7 +100,7 @@ function BuildCard({ build, onEdit }: { build: CommunityBuild; onEdit?: (build: 
       {/* Parts */}
       {build.parts.length > 0 && (
         <div className="space-y-1.5">
-          {build.parts.slice(0, 5).map((part, i) => (
+          {(expanded ? build.parts : build.parts.slice(0, 3)).map((part, i) => (
             <div key={i} className="flex items-center justify-between text-sm px-3 py-1.5 rounded-lg bg-secondary/50">
               <span className="truncate">
                 <span className="text-muted-foreground mr-2">{part.category}</span>
@@ -111,8 +111,13 @@ function BuildCard({ build, onEdit }: { build: CommunityBuild; onEdit?: (build: 
               </span>
             </div>
           ))}
-          {build.parts.length > 5 && (
-            <p className="text-xs text-muted-foreground pl-3">+{build.parts.length - 5} more</p>
+          {build.parts.length > 3 && (
+            <button
+              onClick={() => setExpanded(!expanded)}
+              className="text-xs text-primary hover:underline pl-3 cursor-pointer"
+            >
+              {expanded ? 'Show less' : `+${build.parts.length - 3} more parts`}
+            </button>
           )}
         </div>
       )}
