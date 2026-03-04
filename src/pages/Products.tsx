@@ -143,14 +143,19 @@ export default function Products() {
               return (
                 <div
                   key={product.id}
-                  className="glass-effect rounded-xl overflow-hidden hover:border-primary/30 transition-all duration-300 animate-fade-in"
+                  className="glass-effect rounded-xl overflow-hidden hover:border-primary/30 transition-all duration-300 animate-fade-in cursor-pointer"
                   style={{ animationDelay: `${index * 50}ms` }}
+                  onClick={() => setExpandedProduct(isExpanded ? null : product.id)}
                 >
                   <div className="p-6">
                     <div className="flex gap-4">
                       {/* Product Image */}
-                      <div className="w-24 h-24 shrink-0 rounded-lg bg-secondary/50 flex items-center justify-center">
-                        <IconComponent className="h-12 w-12 text-primary/50" />
+                      <div className={`shrink-0 rounded-lg bg-secondary/50 flex items-center justify-center transition-all duration-300 ${isExpanded ? 'w-32 h-32' : 'w-24 h-24'}`}>
+                        {product.image_url ? (
+                          <img src={product.image_url} alt={product.name} className="w-full h-full object-cover rounded-lg" />
+                        ) : (
+                          <IconComponent className={`text-primary/50 transition-all ${isExpanded ? 'h-16 w-16' : 'h-12 w-12'}`} />
+                        )}
                       </div>
 
                       {/* Product Info */}
@@ -167,23 +172,37 @@ export default function Products() {
                           )}
                         </div>
 
-                        <p className="text-sm text-muted-foreground line-clamp-2 mt-2">
+                        <p className={`text-sm text-muted-foreground mt-2 ${isExpanded ? '' : 'line-clamp-2'}`}>
                           {product.description}
                         </p>
 
-                        {/* Specs */}
-                        <div className="flex flex-wrap gap-2 mt-3">
-                          {Object.entries(product.specs).slice(0, 3).map(([key, value]) => (
-                            <span
-                              key={key}
-                              className="px-2 py-1 rounded-md bg-secondary text-xs text-muted-foreground"
-                            >
-                              {value}
-                            </span>
+                        {/* Specs preview (collapsed) */}
+                        {!isExpanded && (
+                          <div className="flex flex-wrap gap-2 mt-3">
+                            {Object.entries(product.specs).slice(0, 3).map(([key, value]) => (
+                              <span key={key} className="px-2 py-1 rounded-md bg-secondary text-xs text-muted-foreground">
+                                {value}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Expanded: Full Specs */}
+                    {isExpanded && (
+                      <div className="mt-4 pt-4 border-t border-border animate-fade-in">
+                        <h4 className="text-sm font-medium mb-3">Specifications</h4>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                          {Object.entries(product.specs).map(([key, value]) => (
+                            <div key={key} className="p-2.5 rounded-lg bg-secondary/50">
+                              <p className="text-xs text-muted-foreground capitalize">{key.replace(/_/g, ' ')}</p>
+                              <p className="text-sm font-medium mt-0.5">{String(value)}</p>
+                            </div>
                           ))}
                         </div>
                       </div>
-                    </div>
+                    )}
 
                     {/* Price & Sellers Summary */}
                     <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
@@ -198,9 +217,12 @@ export default function Products() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => setExpandedProduct(isExpanded ? null : product.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExpandedProduct(isExpanded ? null : product.id);
+                        }}
                       >
-                        {isExpanded ? 'Hide' : 'Compare'} prices
+                        {isExpanded ? 'Collapse' : 'Details'}
                         {isExpanded ? (
                           <ChevronUp className="h-4 w-4 ml-1" />
                         ) : (
@@ -221,6 +243,7 @@ export default function Products() {
                             <div
                               key={listing.id}
                               className="flex items-center justify-between p-3 rounded-lg bg-card/50 border border-border"
+                              onClick={(e) => e.stopPropagation()}
                             >
                               <div className="flex items-center gap-3">
                                 <div>
