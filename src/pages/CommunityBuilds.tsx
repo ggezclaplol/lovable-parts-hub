@@ -287,13 +287,13 @@ function BuildFormDialog({
 
   // Map category names used in form to category names in DB
   const categoryMap: Record<string, string> = {
-    'CPU': 'CPUs',
-    'GPU': 'GPUs',
+    'CPU': 'CPU',
+    'GPU': 'GPU',
     'RAM': 'RAM',
-    'Motherboard': 'Motherboards',
+    'Motherboard': 'Motherboard',
     'Storage': 'Storage',
-    'PSU': 'Power Supplies',
-    'Case': 'PC Cases',
+    'PSU': 'PSU',
+    'Case': 'Case',
     'Cooling': 'Cooling',
   };
 
