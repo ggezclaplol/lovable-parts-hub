@@ -408,23 +408,41 @@ export type Database = {
       }
       profiles: {
         Row: {
+          address: string | null
           avatar_url: string | null
+          card_last_four: string | null
+          city: string | null
           created_at: string
           id: string
+          payment_method: string | null
+          phone: string | null
+          postal_code: string | null
           updated_at: string
           username: string
         }
         Insert: {
+          address?: string | null
           avatar_url?: string | null
+          card_last_four?: string | null
+          city?: string | null
           created_at?: string
           id: string
+          payment_method?: string | null
+          phone?: string | null
+          postal_code?: string | null
           updated_at?: string
           username: string
         }
         Update: {
+          address?: string | null
           avatar_url?: string | null
+          card_last_four?: string | null
+          city?: string | null
           created_at?: string
           id?: string
+          payment_method?: string | null
+          phone?: string | null
+          postal_code?: string | null
           updated_at?: string
           username?: string
         }

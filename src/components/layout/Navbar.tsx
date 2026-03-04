@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Cpu, Menu, X, Package, LogIn, LogOut, ShieldCheck, User, Wrench, Sun, Moon, Sparkles, Users } from 'lucide-react';
+import { Cpu, Menu, X, Package, LogIn, LogOut, ShieldCheck, User, Wrench, Sun, Moon, Sparkles, Users, UserCog, ShoppingBag } from 'lucide-react';
 import { useState } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { CartSheet } from '@/components/cart/CartSheet';
@@ -109,12 +109,24 @@ export function Navbar() {
                     <p className="text-xs text-primary capitalize mt-1">{user?.role}</p>
                   </div>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate('/account')}>
+                    <UserCog className="h-4 w-4 mr-2" />
+                    My Account
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/account?tab=orders')}>
+                    <ShoppingBag className="h-4 w-4 mr-2" />
+                    My Orders
+                  </DropdownMenuItem>
                   {isAdmin && (
-                    <DropdownMenuItem onClick={() => navigate('/admin')}>
-                      <ShieldCheck className="h-4 w-4 mr-2" />
-                      Admin Dashboard
-                    </DropdownMenuItem>
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => navigate('/admin')}>
+                        <ShieldCheck className="h-4 w-4 mr-2" />
+                        Admin Dashboard
+                      </DropdownMenuItem>
+                    </>
                   )}
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
                     <LogOut className="h-4 w-4 mr-2" />
                     Logout
@@ -174,6 +186,14 @@ export function Navbar() {
                     <p className="font-medium">{user?.name}</p>
                     <p className="text-xs text-muted-foreground">{user?.email}</p>
                   </div>
+                  <Link to="/account" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary/60 transition-colors" onClick={() => setMobileMenuOpen(false)}>
+                    <UserCog className="h-5 w-5 text-primary" />
+                    <span className="font-medium">My Account</span>
+                  </Link>
+                  <Link to="/account?tab=orders" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary/60 transition-colors" onClick={() => setMobileMenuOpen(false)}>
+                    <ShoppingBag className="h-5 w-5 text-primary" />
+                    <span className="font-medium">My Orders</span>
+                  </Link>
                   <button className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-destructive/10 text-destructive transition-colors" onClick={() => { handleLogout(); setMobileMenuOpen(false); }}>
                     <LogOut className="h-5 w-5" />
                     <span className="font-medium">Logout</span>

@@ -17,6 +17,7 @@ import AIBuilder from "./pages/AIBuilder";
 import CommunityBuilds from "./pages/CommunityBuilds";
 import About from "./pages/About";
 import Support from "./pages/Support";
+import Account from "./pages/Account";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,14 @@ const App = () => (
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route
+              path="/account"
+              element={
+                <ProtectedRoute>
+                  <Account />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/admin"
               element={
