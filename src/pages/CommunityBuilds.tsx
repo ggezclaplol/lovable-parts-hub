@@ -589,7 +589,7 @@ export default function CommunityBuilds() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {builds?.map((build) => (
-              <BuildCard key={build.id} build={build} />
+              <BuildCard key={build.id} build={build} onEdit={handleEdit} />
             ))}
           </div>
         )}
