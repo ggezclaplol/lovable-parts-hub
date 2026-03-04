@@ -202,7 +202,7 @@ export default function Index() {
             ].map((feature, i) => (
               <div
                 key={feature.title}
-                className="bento-card p-6 animate-fade-in"
+                className="bento-card p-6 animate-fade-in h-full flex flex-col"
                 style={{ animationDelay: `${(i + 10) * 60}ms` }}
               >
                 <div className="w-10 h-10 mb-4 rounded-xl bg-primary/10 flex items-center justify-center">
