@@ -86,7 +86,7 @@ function BuildCard({ build }: { build: CommunityBuild }) {
                 {part.name}
               </span>
               <span className="font-mono text-xs text-primary shrink-0 ml-2">
-                ${part.price.toLocaleString()}
+                ₨{part.price.toLocaleString()}
               </span>
             </div>
           ))}
