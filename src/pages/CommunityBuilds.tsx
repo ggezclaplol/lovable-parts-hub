@@ -48,14 +48,106 @@ import {
   ImagePlus,
   X,
   Pencil,
+  ChevronDown,
+  CircuitBoard,
+  MemoryStick,
+  HardDrive,
+  Zap,
+  Box,
+  Fan,
+  Monitor,
+  Package,
+  BadgeCheck,
+  Star,
 } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { supabase } from '@/integrations/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
+
+const categoryIcons: Record<string, React.ElementType> = {
+  CPU: Cpu,
+  GPU: Monitor,
+  RAM: MemoryStick,
+  Motherboard: CircuitBoard,
+  Storage: HardDrive,
+  PSU: Zap,
+  Case: Box,
+  Cooling: Fan,
+};
+
+interface PartProductDetail {
+  name: string;
+  brand: string;
+  description: string | null;
+  specs: Record<string, any> | null;
+  listing?: {
+    price: number;
+    condition: string | null;
+    stock: number;
+    shipping_cost: number | null;
+    seller: { name: string; rating: number | null; verified: boolean | null };
+  };
+}
 
 function BuildCard({ build, onEdit, onViewDetail }: { build: CommunityBuild; onEdit?: (build: CommunityBuild) => void; onViewDetail?: (build: CommunityBuild) => void }) {
   const { isAuthenticated, user } = useAuth();
   const toggleLike = useToggleLike();
   const deleteBuild = useDeleteBuild();
   const [showComments, setShowComments] = useState(false);
+  const [partDetails, setPartDetails] = useState<Record<string, PartProductDetail>>({});
+  const [detailsLoaded, setDetailsLoaded] = useState(false);
+
+  useEffect(() => {
+    const productIds = build.parts.filter(p => p.product_id).map(p => p.product_id!);
+    if (productIds.length === 0) { setDetailsLoaded(true); return; }
+
+    (async () => {
+      try {
+        const { data: products } = await supabase
+          .from('products')
+          .select('id, name, brand, description, specs')
+          .in('id', productIds);
+
+        const listingIds = build.parts.filter(p => p.listing_id).map(p => p.listing_id!);
+        let listingsMap: Record<string, any> = {};
+        if (listingIds.length > 0) {
+          const { data: listings } = await supabase
+            .from('product_listings')
+            .select('id, price, condition, stock, shipping_cost, seller_id')
+            .in('id', listingIds);
+          if (listings && listings.length > 0) {
+            const sellerIds = [...new Set(listings.map(l => l.seller_id))];
+            const { data: sellers } = await supabase
+              .from('sellers')
+              .select('id, name, rating, verified')
+              .in('id', sellerIds);
+            const sellersMap = Object.fromEntries((sellers || []).map(s => [s.id, s]));
+            for (const listing of listings) {
+              listingsMap[listing.id] = { ...listing, seller: sellersMap[listing.seller_id] || { name: 'Unknown', rating: null, verified: false } };
+            }
+          }
+        }
+
+        const details: Record<string, PartProductDetail> = {};
+        for (const product of products || []) {
+          const part = build.parts.find(p => p.product_id === product.id);
+          const listing = part?.listing_id ? listingsMap[part.listing_id] : undefined;
+          details[product.id] = {
+            name: product.name,
+            brand: product.brand,
+            description: product.description,
+            specs: product.specs as Record<string, any> | null,
+            listing: listing ? { price: listing.price, condition: listing.condition, stock: listing.stock, shipping_cost: listing.shipping_cost, seller: listing.seller } : undefined,
+          };
+        }
+        setPartDetails(details);
+      } catch (err) {
+        console.error('Failed to fetch part details for card', err);
+      } finally {
+        setDetailsLoaded(true);
+      }
+    })();
+  }, [build.parts]);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const useCaseInfo = USE_CASES.find((u) => u.value === build.use_case) || USE_CASES[USE_CASES.length - 1];
@@ -101,18 +193,81 @@ function BuildCard({ build, onEdit, onViewDetail }: { build: CommunityBuild; onE
 
       {/* Parts */}
       {build.parts.length > 0 && (
-        <div className="space-y-1.5">
-          {(expanded ? build.parts : build.parts.slice(0, 3)).map((part, i) => (
-            <div key={i} className="flex items-center justify-between text-sm px-3 py-1.5 rounded-lg bg-secondary/50">
-              <span className="truncate">
-                <span className="text-muted-foreground mr-2">{part.category}</span>
-                {part.name}
-              </span>
-              <span className="font-mono text-xs text-primary shrink-0 ml-2">
-                ₨{part.price.toLocaleString()}
-              </span>
-            </div>
-          ))}
+        <div className="space-y-1.5" onClick={(e) => e.stopPropagation()}>
+          {(expanded ? build.parts : build.parts.slice(0, 3)).map((part, i) => {
+            const detail = part.product_id ? partDetails[part.product_id] : null;
+            const Icon = categoryIcons[part.category] || Package;
+
+            return (
+              <Collapsible key={i}>
+                <div className="rounded-lg border border-border/50 bg-secondary/50 overflow-hidden">
+                  <CollapsibleTrigger className="w-full">
+                    <div className="flex items-center gap-2 px-3 py-1.5 text-sm hover:bg-secondary/80 transition-colors">
+                      <Icon className="h-3.5 w-3.5 text-primary shrink-0" />
+                      <span className="truncate text-left flex-1">
+                        <span className="text-muted-foreground mr-1.5">{part.category}</span>
+                        {part.name}
+                      </span>
+                      <span className="font-mono text-xs text-primary shrink-0 ml-2">
+                        ₨{part.price.toLocaleString()}
+                      </span>
+                      {detail && <ChevronDown className="h-3 w-3 shrink-0 text-muted-foreground transition-transform duration-200" />}
+                    </div>
+                  </CollapsibleTrigger>
+
+                  {detail && (
+                    <CollapsibleContent>
+                      <div className="border-t border-border/50 px-3 py-2.5 bg-background/50 space-y-2 text-xs">
+                        {detail.specs && Object.keys(detail.specs).length > 0 && (
+                          <div>
+                            <p className="font-medium text-muted-foreground mb-1">Specs</p>
+                            <div className="grid grid-cols-2 gap-x-3 gap-y-0.5">
+                              {Object.entries(detail.specs).map(([key, value]) => (
+                                <div key={key} className="flex justify-between">
+                                  <span className="text-muted-foreground capitalize">{key.replace(/_/g, ' ')}</span>
+                                  <span className="font-medium text-foreground">{String(value)}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {detail.listing && (
+                          <div>
+                            <p className="font-medium text-muted-foreground mb-1">Seller</p>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-medium">{detail.listing.seller.name}</span>
+                                {detail.listing.seller.verified && <BadgeCheck className="h-3 w-3 text-primary" />}
+                                {detail.listing.seller.rating && (
+                                  <span className="flex items-center gap-0.5 text-muted-foreground">
+                                    <Star className="h-2.5 w-2.5 fill-warning text-warning" />
+                                    {detail.listing.seller.rating.toFixed(1)}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2 text-muted-foreground">
+                                <span>Current: ₨{detail.listing.price.toLocaleString()}</span>
+                                {detail.listing.shipping_cost && detail.listing.shipping_cost > 0 ? (
+                                  <span>+₨{detail.listing.shipping_cost} ship</span>
+                                ) : (
+                                  <span className="text-green-500">Free ship</span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {detail.description && (
+                          <p className="text-muted-foreground leading-relaxed">{detail.description}</p>
+                        )}
+                      </div>
+                    </CollapsibleContent>
+                  )}
+                </div>
+              </Collapsible>
+            );
+          })}
           {build.parts.length > 3 && (
             <button
               onClick={() => setExpanded(!expanded)}
