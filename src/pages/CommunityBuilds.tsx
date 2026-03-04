@@ -24,6 +24,7 @@ import {
   useCommunityBuilds,
   useCreateBuild,
   useUpdateBuild,
+  useDeleteBuild,
   useToggleLike,
   useBuildComments,
   useAddComment,
