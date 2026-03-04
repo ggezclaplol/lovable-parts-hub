@@ -258,6 +258,31 @@ export function useUpdateBuild() {
   });
 }
 
+export function useDeleteBuild() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (buildId: string) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { error } = await supabase
+        .from('community_builds')
+        .delete()
+        .eq('id', buildId)
+        .eq('user_id', user.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['community-builds'] });
+      toast.success('Build deleted');
+    },
+    onError: () => {
+      toast.error('Failed to delete build');
+    },
+  });
+}
+
 export function useToggleLike() {
   const queryClient = useQueryClient();
 
