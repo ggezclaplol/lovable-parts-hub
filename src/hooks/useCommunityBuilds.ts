@@ -63,6 +63,7 @@ export function useCommunityBuilds(useCaseFilter?: string) {
           likes_count,
           comments_count,
           created_at,
+          image_url,
           profiles!community_builds_user_id_profiles_fkey (username, avatar_url)
         `)
         .order('created_at', { ascending: false });
