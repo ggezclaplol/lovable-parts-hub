@@ -191,6 +191,73 @@ export function useCreateBuild() {
   });
 }
 
+export function useUpdateBuild() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (build: {
+      id: string;
+      title: string;
+      description: string;
+      use_case: string;
+      parts: BuildPart[];
+      total_price: number;
+      image?: File;
+      existing_image_url?: string | null;
+      remove_image?: boolean;
+    }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      let image_url: string | null | undefined = undefined;
+
+      if (build.remove_image) {
+        image_url = null;
+      } else if (build.image) {
+        const fileExt = build.image.name.split('.').pop();
+        const filePath = `${user.id}/${crypto.randomUUID()}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from('build-images')
+          .upload(filePath, build.image);
+        if (uploadError) throw uploadError;
+        const { data: urlData } = supabase.storage
+          .from('build-images')
+          .getPublicUrl(filePath);
+        image_url = urlData.publicUrl;
+      }
+
+      const updateData: any = {
+        title: build.title,
+        description: build.description,
+        use_case: build.use_case,
+        parts: build.parts as any,
+        total_price: build.total_price,
+      };
+      if (image_url !== undefined) {
+        updateData.image_url = image_url;
+      }
+
+      const { data, error } = await supabase
+        .from('community_builds')
+        .update(updateData)
+        .eq('id', build.id)
+        .eq('user_id', user.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['community-builds'] });
+      toast.success('Build updated successfully!');
+    },
+    onError: () => {
+      toast.error('Failed to update build');
+    },
+  });
+}
+
 export function useToggleLike() {
   const queryClient = useQueryClient();
 

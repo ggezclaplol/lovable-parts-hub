@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import {
   useCommunityBuilds,
   useCreateBuild,
+  useUpdateBuild,
   useToggleLike,
   useBuildComments,
   useAddComment,
@@ -43,14 +44,16 @@ import {
   Filter,
   ImagePlus,
   X,
+  Pencil,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
-function BuildCard({ build }: { build: CommunityBuild }) {
-  const { isAuthenticated } = useAuth();
+function BuildCard({ build, onEdit }: { build: CommunityBuild; onEdit?: (build: CommunityBuild) => void }) {
+  const { isAuthenticated, user } = useAuth();
   const toggleLike = useToggleLike();
   const [showComments, setShowComments] = useState(false);
   const useCaseInfo = USE_CASES.find((u) => u.value === build.use_case) || USE_CASES[USE_CASES.length - 1];
+  const isOwner = user?.id === build.user_id;
 
   return (
     <div className="bento-card overflow-hidden flex flex-col animate-fade-in">
@@ -139,6 +142,15 @@ function BuildCard({ build }: { build: CommunityBuild }) {
           <MessageCircle className="h-4 w-4" />
           {build.comments_count}
         </button>
+        {isOwner && onEdit && (
+          <button
+            onClick={() => onEdit(build)}
+            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer ml-auto"
+          >
+            <Pencil className="h-4 w-4" />
+            Edit
+          </button>
+        )}
       </div>
 
       {/* Comments Section */}
@@ -213,15 +225,50 @@ function CommentsSection({ buildId }: { buildId: string }) {
   );
 }
 
-function CreateBuildDialog() {
-  const [open, setOpen] = useState(false);
+function BuildFormDialog({
+  open,
+  onOpenChange,
+  editBuild,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  editBuild?: CommunityBuild | null;
+}) {
+  const isEdit = !!editBuild;
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [useCase, setUseCase] = useState('gaming');
   const [parts, setParts] = useState<BuildPart[]>([{ name: '', category: 'CPU', price: 0 }]);
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [removeExistingImage, setRemoveExistingImage] = useState(false);
   const createBuild = useCreateBuild();
+  const updateBuild = useUpdateBuild();
+
+  const resetForm = () => {
+    setTitle('');
+    setDescription('');
+    setUseCase('gaming');
+    setParts([{ name: '', category: 'CPU', price: 0 }]);
+    setImage(null);
+    setImagePreview(null);
+    setRemoveExistingImage(false);
+  };
+
+  // Populate form when editing
+  useEffect(() => {
+    if (editBuild && open) {
+      setTitle(editBuild.title);
+      setDescription(editBuild.description);
+      setUseCase(editBuild.use_case);
+      setParts(editBuild.parts.length > 0 ? [...editBuild.parts] : [{ name: '', category: 'CPU', price: 0 }]);
+      setImagePreview(editBuild.image_url || null);
+      setImage(null);
+      setRemoveExistingImage(false);
+    } else if (!open) {
+      resetForm();
+    }
+  }, [editBuild, open]);
 
   const addPart = () => setParts([...parts, { name: '', category: 'GPU', price: 0 }]);
   const removePart = (index: number) => setParts(parts.filter((_, i) => i !== index));
@@ -234,59 +281,77 @@ function CreateBuildDialog() {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        return; // Max 5MB
-      }
+      if (file.size > 5 * 1024 * 1024) return;
       setImage(file);
+      setRemoveExistingImage(false);
       setImagePreview(URL.createObjectURL(file));
     }
   };
 
   const removeImage = () => {
     setImage(null);
-    if (imagePreview) URL.revokeObjectURL(imagePreview);
+    if (imagePreview && !editBuild?.image_url) URL.revokeObjectURL(imagePreview);
     setImagePreview(null);
+    if (editBuild?.image_url) setRemoveExistingImage(true);
   };
 
+
   const totalPrice = parts.reduce((sum, p) => sum + (Number(p.price) || 0), 0);
+  const isPending = createBuild.isPending || updateBuild.isPending;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const validParts = parts.filter((p) => p.name.trim());
-    createBuild.mutate(
-      {
-        title,
-        description,
-        use_case: useCase,
-        parts: validParts,
-        total_price: totalPrice,
-        image: image || undefined,
-      },
-      {
-        onSuccess: () => {
-          setOpen(false);
-          setTitle('');
-          setDescription('');
-          setParts([{ name: '', category: 'CPU', price: 0 }]);
-          removeImage();
+
+    if (isEdit && editBuild) {
+      updateBuild.mutate(
+        {
+          id: editBuild.id,
+          title,
+          description,
+          use_case: useCase,
+          parts: validParts,
+          total_price: totalPrice,
+          image: image || undefined,
+          existing_image_url: editBuild.image_url,
+          remove_image: removeExistingImage,
         },
-      }
-    );
+        {
+          onSuccess: () => {
+            onOpenChange(false);
+            resetForm();
+          },
+        }
+      );
+    } else {
+      createBuild.mutate(
+        {
+          title,
+          description,
+          use_case: useCase,
+          parts: validParts,
+          total_price: totalPrice,
+          image: image || undefined,
+        },
+        {
+          onSuccess: () => {
+            onOpenChange(false);
+            resetForm();
+          },
+        }
+      );
+    }
   };
 
   const categories = ['CPU', 'GPU', 'RAM', 'Motherboard', 'Storage', 'PSU', 'Case', 'Cooling', 'Other'];
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="glow" className="gap-2">
-          <Plus className="h-4 w-4" />
-          Share Your Build
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-display text-xl">Share Your PC Build</DialogTitle>
+          <DialogTitle className="font-display text-xl">
+            {isEdit ? 'Edit Your Build' : 'Share Your PC Build'}
+          </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-5 mt-2">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -406,13 +471,13 @@ function CreateBuildDialog() {
             )}
           </div>
 
-          <Button type="submit" variant="glow" className="w-full" disabled={createBuild.isPending}>
-            {createBuild.isPending ? (
+          <Button type="submit" variant="glow" className="w-full" disabled={isPending}>
+            {isPending ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" /> Sharing...
+                <Loader2 className="h-4 w-4 animate-spin" /> {isEdit ? 'Updating...' : 'Sharing...'}
               </>
             ) : (
-              'Share Build'
+              isEdit ? 'Update Build' : 'Share Build'
             )}
           </Button>
         </form>
@@ -425,6 +490,18 @@ export default function CommunityBuilds() {
   const [useCaseFilter, setUseCaseFilter] = useState('all');
   const { data: builds, isLoading } = useCommunityBuilds(useCaseFilter);
   const { isAuthenticated } = useAuth();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingBuild, setEditingBuild] = useState<CommunityBuild | null>(null);
+
+  const handleEdit = (build: CommunityBuild) => {
+    setEditingBuild(build);
+    setDialogOpen(true);
+  };
+
+  const handleDialogChange = (open: boolean) => {
+    setDialogOpen(open);
+    if (!open) setEditingBuild(null);
+  };
 
   return (
     <Layout>
@@ -442,7 +519,13 @@ export default function CommunityBuilds() {
             <p className="text-muted-foreground mt-1">Browse and share PC builds with the community</p>
           </div>
           {isAuthenticated ? (
-            <CreateBuildDialog />
+            <>
+              <Button variant="glow" className="gap-2" onClick={() => { setEditingBuild(null); setDialogOpen(true); }}>
+                <Plus className="h-4 w-4" />
+                Share Your Build
+              </Button>
+              <BuildFormDialog open={dialogOpen} onOpenChange={handleDialogChange} editBuild={editingBuild} />
+            </>
           ) : (
             <Link to="/login">
               <Button variant="glow" className="gap-2">
@@ -509,7 +592,7 @@ export default function CommunityBuilds() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {builds?.map((build) => (
-              <BuildCard key={build.id} build={build} />
+              <BuildCard key={build.id} build={build} onEdit={handleEdit} />
             ))}
           </div>
         )}
