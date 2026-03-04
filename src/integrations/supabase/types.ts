@@ -153,6 +153,7 @@ export type Database = {
           created_at: string
           description: string
           id: string
+          image_url: string | null
           likes_count: number | null
           parts: Json
           title: string
@@ -166,6 +167,7 @@ export type Database = {
           created_at?: string
           description: string
           id?: string
+          image_url?: string | null
           likes_count?: number | null
           parts?: Json
           title: string
@@ -179,6 +181,7 @@ export type Database = {
           created_at?: string
           description?: string
           id?: string
+          image_url?: string | null
           likes_count?: number | null
           parts?: Json
           title?: string
