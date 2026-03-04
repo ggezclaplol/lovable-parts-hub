@@ -47,6 +47,13 @@ export type Database = {
             referencedRelation: "community_builds"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "build_comments_user_id_profiles_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       build_likes: {
@@ -180,7 +187,15 @@ export type Database = {
           use_case?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "community_builds_user_id_profiles_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       order_items: {
         Row: {
