@@ -246,17 +246,19 @@ function BuildFormDialog({
   const updateBuild = useUpdateBuild();
 
   // Populate form when editing
-  useState(() => {
-    if (editBuild) {
+  useEffect(() => {
+    if (editBuild && open) {
       setTitle(editBuild.title);
       setDescription(editBuild.description);
       setUseCase(editBuild.use_case);
-      setParts(editBuild.parts.length > 0 ? editBuild.parts : [{ name: '', category: 'CPU', price: 0 }]);
-      if (editBuild.image_url) {
-        setImagePreview(editBuild.image_url);
-      }
+      setParts(editBuild.parts.length > 0 ? [...editBuild.parts] : [{ name: '', category: 'CPU', price: 0 }]);
+      setImagePreview(editBuild.image_url || null);
+      setImage(null);
+      setRemoveExistingImage(false);
+    } else if (!open) {
+      resetForm();
     }
-  });
+  }, [editBuild, open]);
 
   const addPart = () => setParts([...parts, { name: '', category: 'GPU', price: 0 }]);
   const removePart = (index: number) => setParts(parts.filter((_, i) => i !== index));
