@@ -337,7 +337,7 @@ function CreateBuildDialog() {
             ))}
             {totalPrice > 0 && (
               <p className="text-sm text-right font-mono">
-                Total: <span className="text-primary font-bold">${totalPrice.toLocaleString()}</span>
+                Total: <span className="text-primary font-bold">₨{totalPrice.toLocaleString()}</span>
               </p>
             )}
           </div>
