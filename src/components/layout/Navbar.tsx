@@ -23,22 +23,22 @@ export function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 glass-effect border-b border-border/50">
+    <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/40">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-              <Cpu className="h-6 w-6 text-primary" />
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <div className="p-2 rounded-xl bg-primary/10 group-hover:bg-primary/15 transition-colors">
+              <Cpu className="h-5 w-5 text-primary" />
             </div>
-            <span className="text-xl font-bold gradient-text">PCForge</span>
+            <span className="text-xl font-serif font-bold text-foreground">PCForge</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-1">
             <Link 
               to="/products" 
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-all text-sm font-medium"
             >
               <Package className="h-4 w-4" />
               Products
@@ -46,7 +46,7 @@ export function Navbar() {
             
             <Link 
               to="/build" 
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-all text-sm font-medium"
             >
               <Wrench className="h-4 w-4" />
               PC Builder
@@ -55,12 +55,14 @@ export function Navbar() {
             {isAdmin && (
               <Link 
                 to="/admin" 
-                className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-all text-sm font-medium"
               >
                 <ShieldCheck className="h-4 w-4" />
                 Admin
               </Link>
             )}
+
+            <div className="w-px h-6 bg-border mx-2" />
 
             <CartSheet />
 
@@ -71,7 +73,7 @@ export function Navbar() {
                     <div className="p-1.5 rounded-full bg-primary/10">
                       <User className="h-4 w-4 text-primary" />
                     </div>
-                    <span className="hidden lg:inline">{user?.name}</span>
+                    <span className="hidden lg:inline text-sm">{user?.name}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
@@ -95,7 +97,7 @@ export function Navbar() {
               </DropdownMenu>
             ) : (
               <Link to="/login">
-                <Button variant="outline" size="sm" className="gap-2">
+                <Button variant="default" size="sm" className="gap-2 rounded-full px-5">
                   <LogIn className="h-4 w-4" />
                   Login
                 </Button>
@@ -107,7 +109,7 @@ export function Navbar() {
           <div className="md:hidden flex items-center gap-2">
             <CartSheet />
             <button
-              className="p-2 text-muted-foreground hover:text-foreground"
+              className="p-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-secondary/60 transition-colors"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -117,62 +119,62 @@ export function Navbar() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-border animate-fade-in">
-            <div className="flex flex-col gap-2">
+          <div className="md:hidden py-4 border-t border-border/40 animate-fade-in">
+            <div className="flex flex-col gap-1">
               <Link
                 to="/products"
-                className="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-secondary transition-colors"
+                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary/60 transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <Package className="h-5 w-5 text-primary" />
-                Products
+                <span className="font-medium">Products</span>
               </Link>
               
               <Link
                 to="/build"
-                className="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-secondary transition-colors"
+                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary/60 transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <Wrench className="h-5 w-5 text-primary" />
-                PC Builder
+                <span className="font-medium">PC Builder</span>
               </Link>
               
               {isAdmin && (
                 <Link
                   to="/admin"
-                  className="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-secondary transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary/60 transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <ShieldCheck className="h-5 w-5 text-primary" />
-                  Admin Dashboard
+                  <span className="font-medium">Admin Dashboard</span>
                 </Link>
               )}
 
               {isAuthenticated ? (
                 <>
-                  <div className="px-4 py-3 border-t border-border mt-2">
-                    <p className="text-sm font-medium">{user?.name}</p>
+                  <div className="px-4 py-3 border-t border-border/40 mt-2">
+                    <p className="font-medium">{user?.name}</p>
                     <p className="text-xs text-muted-foreground">{user?.email}</p>
                   </div>
                   <button
-                    className="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-destructive/10 text-destructive transition-colors"
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-destructive/10 text-destructive transition-colors"
                     onClick={() => {
                       handleLogout();
                       setMobileMenuOpen(false);
                     }}
                   >
                     <LogOut className="h-5 w-5" />
-                    Logout
+                    <span className="font-medium">Logout</span>
                   </button>
                 </>
               ) : (
                 <Link
                   to="/login"
-                  className="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-secondary transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary/60 transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <LogIn className="h-5 w-5 text-primary" />
-                  Login
+                  <span className="font-medium">Login</span>
                 </Link>
               )}
             </div>
