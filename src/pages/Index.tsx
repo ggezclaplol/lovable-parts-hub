@@ -2,12 +2,12 @@ import { Link } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { useCategories, useProducts } from '@/hooks/useProducts';
-import { 
-  Cpu, 
-  Monitor, 
-  HardDrive, 
-  MemoryStick, 
-  ArrowRight, 
+import {
+  Cpu,
+  Monitor,
+  HardDrive,
+  MemoryStick,
+  ArrowRight,
   Zap,
   Shield,
   Truck,
@@ -18,8 +18,8 @@ import {
   Sparkles,
   Wrench,
   TrendingUp,
-  Users,
-} from 'lucide-react';
+  Users } from
+'lucide-react';
 
 const categoryIcons: Record<string, React.ElementType> = {
   CPU: Cpu,
@@ -29,7 +29,7 @@ const categoryIcons: Record<string, React.ElementType> = {
   Motherboard: CircuitBoard,
   PSU: Zap,
   Case: Box,
-  Cooling: Fan,
+  Cooling: Fan
 };
 
 export default function Index() {
@@ -38,7 +38,7 @@ export default function Index() {
 
   const categoryCounts = categories?.map((cat) => ({
     ...cat,
-    count: products?.filter((p) => p.category?.id === cat.id).length || 0,
+    count: products?.filter((p) => p.category?.id === cat.id).length || 0
   }));
 
   return (
@@ -57,7 +57,7 @@ export default function Index() {
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-4 leading-[1.1]">
                 Build Your
-                <span className="block gradient-text text-glow">Dream Rig</span>
+                <span className="block gradient-text text-glow py-[10px]">Dream Rig</span>
               </h1>
               <p className="text-muted-foreground max-w-md text-base leading-relaxed mb-8">
                 Compare prices, check compatibility, and assemble the ultimate gaming PC — all in one place.
@@ -111,8 +111,8 @@ export default function Index() {
           <Link
             to="/ai-builder"
             className="md:col-span-6 lg:col-span-12 bento-card neon-border p-6 lg:p-8 flex flex-col sm:flex-row items-center gap-6 group animate-fade-in relative overflow-hidden"
-            style={{ animationDelay: '180ms' }}
-          >
+            style={{ animationDelay: '180ms' }}>
+            
             <div className="absolute inset-0 bg-gradient-to-r from-primary/[0.06] via-transparent to-primary/[0.03]" />
             <div className="relative p-4 rounded-2xl bg-primary/10 neon-border group-hover:bg-primary/15 transition-all shrink-0">
               <Sparkles className="h-8 w-8 text-primary" />
@@ -133,8 +133,8 @@ export default function Index() {
           <Link
             to="/community"
             className="md:col-span-6 lg:col-span-12 bento-card p-6 lg:p-8 flex flex-col sm:flex-row items-center gap-6 group animate-fade-in relative overflow-hidden"
-            style={{ animationDelay: '220ms' }}
-          >
+            style={{ animationDelay: '220ms' }}>
+            
             <div className="absolute inset-0 bg-gradient-to-r from-accent/[0.04] via-transparent to-accent/[0.02]" />
             <div className="relative p-4 rounded-2xl bg-accent/10 border border-accent/20 group-hover:bg-accent/15 transition-all shrink-0">
               <Users className="h-8 w-8 text-accent" />
@@ -163,53 +163,53 @@ export default function Index() {
           </div>
 
           {/* Category bento cards */}
-          {categoriesLoading ? (
-            Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="md:col-span-3 lg:col-span-3 bento-card p-5 animate-pulse">
+          {categoriesLoading ?
+          Array.from({ length: 8 }).map((_, i) =>
+          <div key={i} className="md:col-span-3 lg:col-span-3 bento-card p-5 animate-pulse">
                 <div className="w-10 h-10 mb-3 rounded-xl bg-secondary" />
                 <div className="h-4 bg-secondary rounded w-3/4 mb-2" />
                 <div className="h-3 bg-secondary rounded w-1/2" />
               </div>
-            ))
-          ) : (
-            categoryCounts?.map((category, index) => {
-              const IconComponent = categoryIcons[category.name] || Package;
-              const isWide = index === 0 || index === 5;
-              return (
-                <Link
-                  key={category.id}
-                  to="/products"
-                  className={`bento-card p-5 group animate-fade-in ${isWide ? 'md:col-span-3 lg:col-span-4' : 'md:col-span-2 lg:col-span-2'}`}
-                  style={{ animationDelay: `${(index + 3) * 60}ms` }}
-                >
+          ) :
+
+          categoryCounts?.map((category, index) => {
+            const IconComponent = categoryIcons[category.name] || Package;
+            const isWide = index === 0 || index === 5;
+            return (
+              <Link
+                key={category.id}
+                to="/products"
+                className={`bento-card p-5 group animate-fade-in ${isWide ? 'md:col-span-3 lg:col-span-4' : 'md:col-span-2 lg:col-span-2'}`}
+                style={{ animationDelay: `${(index + 3) * 60}ms` }}>
+                
                   <div className="w-10 h-10 mb-3 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                     <IconComponent className="h-5 w-5 text-primary" />
                   </div>
                   <h3 className="font-display font-semibold text-sm">{category.name}</h3>
                   <p className="text-xs text-muted-foreground mt-0.5">{category.count} items</p>
-                </Link>
-              );
-            })
-          )}
+                </Link>);
+
+          })
+          }
 
           {/* Features row */}
           {[
-            { icon: Zap, title: 'Lightning Fast', desc: 'Compare specs & prices instantly' },
-            { icon: Shield, title: 'Compatibility', desc: 'Auto-verify all selected parts' },
-            { icon: Truck, title: 'Best Prices', desc: 'Deals from trusted retailers' },
-          ].map((feature, i) => (
-            <div
-              key={feature.title}
-              className="md:col-span-2 lg:col-span-4 bento-card p-6 animate-fade-in"
-              style={{ animationDelay: `${(i + 10) * 60}ms` }}
-            >
+          { icon: Zap, title: 'Lightning Fast', desc: 'Compare specs & prices instantly' },
+          { icon: Shield, title: 'Compatibility', desc: 'Auto-verify all selected parts' },
+          { icon: Truck, title: 'Best Prices', desc: 'Deals from trusted retailers' }].
+          map((feature, i) =>
+          <div
+            key={feature.title}
+            className="md:col-span-2 lg:col-span-4 bento-card p-6 animate-fade-in"
+            style={{ animationDelay: `${(i + 10) * 60}ms` }}>
+            
               <div className="w-10 h-10 mb-4 rounded-xl bg-primary/10 flex items-center justify-center">
                 <feature.icon className="h-5 w-5 text-primary" />
               </div>
               <h3 className="font-display font-semibold mb-1">{feature.title}</h3>
               <p className="text-sm text-muted-foreground">{feature.desc}</p>
             </div>
-          ))}
+          )}
 
           {/* CTA Banner */}
           <div className="md:col-span-6 lg:col-span-12 bento-card neon-border p-8 lg:p-12 flex flex-col lg:flex-row items-center justify-between gap-6 relative overflow-hidden animate-fade-in" style={{ animationDelay: '800ms' }}>
@@ -249,6 +249,6 @@ export default function Index() {
           </div>
         </div>
       </footer>
-    </Layout>
-  );
+    </Layout>);
+
 }
