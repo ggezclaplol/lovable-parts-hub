@@ -312,6 +312,9 @@ function MyOrders() {
 }
 
 export default function Account() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tab = searchParams.get('tab') || 'account';
+
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8 lg:py-12 max-w-3xl">
@@ -322,7 +325,7 @@ export default function Account() {
           <p className="text-muted-foreground mt-1">Manage your profile, addresses and orders</p>
         </div>
 
-        <Tabs defaultValue="account" className="space-y-6">
+        <Tabs value={tab} onValueChange={(v) => setSearchParams({ tab: v })} className="space-y-6">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="account" className="gap-2">
               <User className="h-4 w-4" />
