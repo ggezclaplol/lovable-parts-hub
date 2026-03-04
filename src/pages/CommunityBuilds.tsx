@@ -49,7 +49,7 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
-function BuildCard({ build, onEdit }: { build: CommunityBuild; onEdit?: (build: CommunityBuild) => void }) {
+function BuildCard({ build, onEdit, onViewDetail }: { build: CommunityBuild; onEdit?: (build: CommunityBuild) => void; onViewDetail?: (build: CommunityBuild) => void }) {
   const { isAuthenticated, user } = useAuth();
   const toggleLike = useToggleLike();
   const deleteBuild = useDeleteBuild();
